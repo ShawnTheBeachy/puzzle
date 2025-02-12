@@ -9,5 +9,6 @@ public class ServiceAttribute(ServiceLifetime lifetime) : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Class)]
-public sealed class ServiceAttribute<TPlugin>(ServiceLifetime lifetime) : ServiceAttribute(lifetime)
-    where TPlugin : class;
+public sealed class ServiceAttribute<TService>(ServiceLifetime lifetime)
+    : ServiceAttribute(lifetime)
+    where TService : class;
