@@ -10,8 +10,7 @@ public static class DependencyInjection
     {
         foreach (var plugin in config.Plugins)
         {
-            var allTypes = plugin.Assembly.ExportedTypes;
-            var componentTypes = allTypes.FindComponents();
+            var componentTypes = plugin.AllTypes.GetTypes().FindComponents();
 
             foreach (var type in componentTypes)
                 config.Services.TryAdd(
@@ -21,7 +20,7 @@ public static class DependencyInjection
                         {
                             var services = new ServiceCollection();
                             services.AddTransient(type, type);
-                            var provider = plugin.Bootstrap(config.Services, sp);
+                            var provider = plugin.Bootstrap(services, sp);
                             return provider.GetRequiredService(type);
                         }
                     )

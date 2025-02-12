@@ -1,8 +1,13 @@
-using System.Reflection;
+using Puzzle.Abstractions;
 
 namespace Puzzle;
 
 public sealed class Plugin
 {
-    public Assembly Assembly { get; }
+    public ITypeProvider AllTypes { get; }
+
+    public Plugin(ITypeProvider allTypes)
+    {
+        AllTypes = allTypes;
+    }
 }

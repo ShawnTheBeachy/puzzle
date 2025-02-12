@@ -8,5 +8,5 @@ public static class PluginExtensions
         this Plugin plugin,
         IServiceCollection serviceCollection,
         IServiceProvider serviceProvider
-    ) => serviceProvider;
+    ) => serviceCollection.BuildServiceProvider();
 }

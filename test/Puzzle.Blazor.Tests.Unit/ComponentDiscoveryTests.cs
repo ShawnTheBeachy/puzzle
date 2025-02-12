@@ -21,7 +21,7 @@ public sealed class ComponentDiscoveryTests
     public async Task FindComponents_ShouldNotReturnType_WhenItImplementsIComponentButIsAbstract()
     {
         // Arrange.
-        IReadOnlyList<Type> types = [typeof(ComponentTypeBase)];
+        IReadOnlyList<Type> types = [typeof(TestComponentBase)];
 
         // Act.
         var componentTypes = types.FindComponents().ToArray();
@@ -59,16 +59,6 @@ public sealed class ComponentDiscoveryTests
         await Assert.That(componentTypes).HasCount().EqualToOne();
         await Assert.That(componentTypes[0]).IsEqualTo(types[0]);
     }
-}
-
-file abstract class ComponentTypeBase : IComponent
-{
-    public void Attach(RenderHandle renderHandle)
-    {
-        // Empty.
-    }
-
-    public Task SetParametersAsync(ParameterView parameters) => Task.CompletedTask;
 }
 
 file class ComponentType : IComponent
