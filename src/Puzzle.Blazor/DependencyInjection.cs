@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Puzzle.Bootstrap;
@@ -27,6 +28,9 @@ public static class DependencyInjection
                 );
         }
 
+        config.Services.Replace(
+            ServiceDescriptor.Singleton<IComponentActivator, ServiceProviderComponentActivator>()
+        );
         return config;
     }
 }

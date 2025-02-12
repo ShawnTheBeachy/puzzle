@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Puzzle.Abstractions;
@@ -6,6 +7,30 @@ namespace Puzzle.Blazor.Tests.Unit;
 
 public sealed class DependencyInjectionTests
 {
+    [Test]
+    public async Task AddBlazor_ShouldReplaceComponentActivator_WhenActivatorIsRegistered()
+    {
+        // Arrange.
+        var services = new ServiceCollection().AddSingleton<IComponentActivator>(
+            Substitute.For<IComponentActivator>()
+        );
+        var config = new PuzzleConfiguration([], Substitute.For<IConfiguration>(), services);
+
+        // Act.
+        config.AddBlazor();
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert.That(services).HasCount().EqualToOne();
+        await Assert.That(services[0].ServiceType).IsEqualTo(typeof(IComponentActivator));
+        await Assert
+            .That(services[0].ImplementationType)
+            .IsEqualTo(typeof(ServiceProviderComponentActivator));
+        await Assert.That(services[0].Lifetime).IsEqualTo(ServiceLifetime.Singleton);
+        var resolved = services.BuildServiceProvider().GetRequiredService<IComponentActivator>();
+        await Assert.That(resolved).IsTypeOf<ServiceProviderComponentActivator>();
+    }
+
     [Test]
     public async Task AddBlazor_ShouldAddComponentsFromPlugin_WhenPluginHasComponents()
     {
@@ -30,7 +55,7 @@ public sealed class DependencyInjectionTests
 
         // Assert.
         using var asserts = Assert.Multiple();
-        await Assert.That(services).HasCount().EqualTo(2);
+        await Assert.That(services).HasCount().EqualTo(3);
 
         await Assert.That(services[0].ServiceType).IsEqualTo(typeof(ComponentA));
         await Assert.That(services[0].Lifetime).IsEqualTo(ServiceLifetime.Transient);
