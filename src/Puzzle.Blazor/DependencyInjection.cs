@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Puzzle.Abstractions;
 using Puzzle.Bootstrap;
 
 namespace Puzzle.Blazor;
@@ -32,5 +35,18 @@ public static class DependencyInjection
             ServiceDescriptor.Singleton<IComponentActivator, ServiceProviderComponentActivator>()
         );
         return config;
+    }
+
+    public static RazorComponentsEndpointConventionBuilder AddPluginComponents(
+        this RazorComponentsEndpointConventionBuilder builder,
+        IHost host
+    )
+    {
+        using var scope = host.Services.CreateScope();
+        var pluginLoader = scope.ServiceProvider.GetRequiredService<IPluginLoader>();
+        builder.AddAdditionalAssemblies(
+            pluginLoader.Plugins().Select(plugin => plugin.Assembly).ToArray()
+        );
+        return builder;
     }
 }
