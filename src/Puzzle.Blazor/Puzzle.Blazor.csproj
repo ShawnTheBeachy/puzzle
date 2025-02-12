@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Puzzle\Puzzle.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
 </Project>
