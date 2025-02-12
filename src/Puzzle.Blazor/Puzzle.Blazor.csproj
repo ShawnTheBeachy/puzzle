@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -13,6 +13,10 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Puzzle.Blazor.Tests.Unit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Puzzle\Puzzle.csproj" />
   </ItemGroup>
 
 </Project>
