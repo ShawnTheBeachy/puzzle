@@ -1,4 +1,5 @@
-﻿using Puzzle.Tests.Unit.TestPlugin;
+﻿using System.Diagnostics;
+using Puzzle.Tests.Unit.TestPlugin;
 
 namespace Puzzle.Tests.Unit;
 
@@ -18,6 +19,9 @@ public sealed class PluginTests
         await Assert.That(plugin).IsNotNull();
         await Assert.That(plugin!.Id).IsEqualTo(new ExportedMetadata().Id);
         await Assert.That(plugin.Name).IsEqualTo(new ExportedMetadata().Name);
+        await Assert
+            .That(plugin.Version)
+            .IsEqualTo(FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion);
         await Assert
             .That(plugin.Assembly.Location)
             .IsEqualTo(typeof(ExportedMetadata).Assembly.Location);

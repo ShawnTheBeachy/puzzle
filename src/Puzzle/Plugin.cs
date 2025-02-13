@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using Puzzle.Abstractions;
 
@@ -10,6 +11,7 @@ public sealed class Plugin
     public Type? BootstrapperType { get; }
     public string Id { get; }
     public string Name { get; }
+    public string? Version { get; }
 
     internal Plugin(
         ITypeProvider allTypes,
@@ -23,6 +25,7 @@ public sealed class Plugin
         BootstrapperType = bootstrapperType;
         Id = metadata.Id;
         Name = metadata.Name;
+        Version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
     }
 
     internal static bool TryCreate(Assembly assembly, out Plugin? plugin)
