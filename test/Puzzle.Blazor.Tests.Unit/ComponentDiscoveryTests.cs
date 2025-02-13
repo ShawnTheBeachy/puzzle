@@ -42,7 +42,7 @@ public sealed class ComponentDiscoveryTests
         // Assert.
         using var asserts = Assert.Multiple();
         await Assert.That(componentTypes).HasCount().EqualToOne();
-        await Assert.That(componentTypes[0]).IsEqualTo(types[0]);
+        await Assert.That(componentTypes[0]).IsSameReferenceAs(types[0]);
     }
 
     [Test]
@@ -57,7 +57,7 @@ public sealed class ComponentDiscoveryTests
         // Assert.
         using var asserts = Assert.Multiple();
         await Assert.That(componentTypes).HasCount().EqualToOne();
-        await Assert.That(componentTypes[0]).IsEqualTo(types[0]);
+        await Assert.That(componentTypes[0]).IsSameReferenceAs(types[0]);
     }
 }
 

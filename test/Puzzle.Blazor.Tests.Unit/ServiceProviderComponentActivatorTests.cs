@@ -22,7 +22,7 @@ public sealed class ServiceProviderComponentActivatorTests
         using var asserts = Assert.Multiple();
         await Assert.That(instance).IsNotNull();
         await Assert.That(instance).IsTypeOf<ResolvableComponent>();
-        await Assert.That(((ResolvableComponent)instance).Service).IsEqualTo(service);
+        await Assert.That(((ResolvableComponent)instance).Service).IsSameReferenceAs(service);
     }
 
     [Test]

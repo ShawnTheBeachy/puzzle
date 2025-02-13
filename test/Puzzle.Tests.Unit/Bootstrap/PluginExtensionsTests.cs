@@ -15,7 +15,7 @@ public sealed class PluginExtensionsTests
         // Arrange.
         var plugin = new Plugin(
             Substitute.For<ITypeProvider>(),
-            null!,
+            typeof(PluginExtensionsTests).Assembly,
             null,
             Substitute.For<IPluginMetadata>()
         );
@@ -38,7 +38,7 @@ public sealed class PluginExtensionsTests
         // Arrange.
         var plugin = new Plugin(
             Substitute.For<ITypeProvider>(),
-            null!,
+            typeof(PluginExtensionsTests).Assembly,
             null,
             Substitute.For<IPluginMetadata>()
         );
@@ -52,7 +52,9 @@ public sealed class PluginExtensionsTests
 
         // Assert.
         using var asserts = Assert.Multiple();
-        await Assert.That(bootstrapped.GetService<ILoggerFactory>()).IsEqualTo(loggerFactory);
+        await Assert
+            .That(bootstrapped.GetService<ILoggerFactory>())
+            .IsSameReferenceAs(loggerFactory);
         await Assert.That(bootstrapped.GetService<ILogger<PluginExtensionsTests>>()).IsNotNull();
     }
 

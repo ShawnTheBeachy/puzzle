@@ -17,7 +17,7 @@ public sealed class PluginBootstrapperTests
         // Arrange.
         var plugin = new Plugin(
             Substitute.For<ITypeProvider>(),
-            null!,
+            typeof(PluginBootstrapperTests).Assembly,
             null,
             Substitute.For<IPluginMetadata>()
         );

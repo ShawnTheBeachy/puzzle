@@ -42,6 +42,8 @@ public sealed class LoggingBootstrapperTests
         );
 
         // Assert.
-        await Assert.That(bootstrapped.GetService<ILoggerFactory>()).IsEqualTo(loggerFactory);
+        await Assert
+            .That(bootstrapped.GetService<ILoggerFactory>())
+            .IsSameReferenceAs(loggerFactory);
     }
 }

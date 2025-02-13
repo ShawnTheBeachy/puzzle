@@ -30,7 +30,7 @@ public sealed class HttpContextBootstrapperTests
             .That(
                 bootstrapped.GetRequiredService<IHttpContextAccessor>().HttpContext?.RequestServices
             )
-            .IsEqualTo(serviceProvider);
+            .IsSameReferenceAs(serviceProvider);
     }
 
     [Test]
