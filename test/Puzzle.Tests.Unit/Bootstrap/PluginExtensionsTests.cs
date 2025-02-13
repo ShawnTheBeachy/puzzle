@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Puzzle.Abstractions;
 using Puzzle.Bootstrap;
 
@@ -15,7 +16,7 @@ public sealed class PluginExtensionsTests
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns((HttpContext?)null);
         var baseServices = Substitute.For<IServiceProvider>();
-        baseServices.GetService(Arg.Is(typeof(IHttpContextAccessor))).Returns(httpContextAccessor);
+        baseServices.GetService(typeof(IHttpContextAccessor)).Returns(httpContextAccessor);
         var services = new ServiceCollection();
 
         // Act.
@@ -23,5 +24,24 @@ public sealed class PluginExtensionsTests
 
         // Assert.
         await Assert.That(bootstrapped.GetService<IHttpContextAccessor>()).IsNotNull();
+    }
+
+    [Test]
+    public async Task Bootstrap_ShouldBootstrapLogging()
+    {
+        // Arrange.
+        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!);
+        var loggerFactory = Substitute.For<ILoggerFactory>();
+        var baseServices = Substitute.For<IServiceProvider>();
+        baseServices.GetService(typeof(ILoggerFactory)).Returns(loggerFactory);
+        var services = new ServiceCollection();
+
+        // Act.
+        var bootstrapped = plugin.Bootstrap(services, baseServices);
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert.That(bootstrapped.GetService<ILoggerFactory>()).IsEqualTo(loggerFactory);
+        await Assert.That(bootstrapped.GetService<ILogger<PluginExtensionsTests>>()).IsNotNull();
     }
 }
