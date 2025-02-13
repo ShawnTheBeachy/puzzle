@@ -35,11 +35,11 @@ public sealed class DependencyInjectionTests
         // Arrange.
         var typeProviderA = Substitute.For<ITypeProvider>();
         typeProviderA.GetTypes().Returns([typeof(ComponentA), typeof(string)]);
-        var pluginA = new Plugin(typeProviderA, null!, null);
+        var pluginA = new Plugin(typeProviderA, null!, null, Substitute.For<IPluginMetadata>());
 
         var typeProviderB = Substitute.For<ITypeProvider>();
         typeProviderB.GetTypes().Returns([typeof(ComponentB), typeof(int)]);
-        var pluginB = new Plugin(typeProviderB, null!, null);
+        var pluginB = new Plugin(typeProviderB, null!, null, Substitute.For<IPluginMetadata>());
 
         var services = new ServiceCollection();
         var config = new PuzzleConfiguration(
