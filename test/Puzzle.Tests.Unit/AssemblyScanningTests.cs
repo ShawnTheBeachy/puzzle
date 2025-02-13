@@ -26,4 +26,17 @@ public sealed class AssemblyScanningTests
             .That(assemblies)
             .Contains(x => x.Location == typeof(AssemblyScanningTests).Assembly.Location);
     }
+
+    [Test]
+    public async Task ScanAssemblies_ShouldSkipLocation_WhenItDoesNotExist()
+    {
+        // Arrange.
+        var options = new PluginOptions { Locations = ["/usr/plugins"] };
+
+        // Act.
+        var assemblies = AssemblyScanning.ScanAssemblies(options).ToArray();
+
+        // Assert.
+        await Assert.That(assemblies).IsEmpty();
+    }
 }

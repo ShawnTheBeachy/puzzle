@@ -7,8 +7,11 @@ internal sealed class PluginLoader : IPluginLoader
 {
     private readonly List<Plugin> _plugins = [];
 
-    public PluginLoader(PluginOptions options, ILogger<PluginLoader> logger)
+    public PluginLoader(PluginOptions? options, ILogger<PluginLoader> logger)
     {
+        if (options is null)
+            return;
+
         var pluginAssemblies = AssemblyScanning.ScanAssemblies(options);
 
         foreach (var assembly in pluginAssemblies)
