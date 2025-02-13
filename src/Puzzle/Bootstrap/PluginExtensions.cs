@@ -8,5 +8,10 @@ public static class PluginExtensions
         this Plugin plugin,
         IServiceCollection serviceCollection,
         IServiceProvider serviceProvider
-    ) => serviceCollection.BuildServiceProvider();
+    ) =>
+        new HttpContextBootstrapper().Bootstrap(
+            serviceCollection,
+            serviceProvider,
+            (sc, _) => sc.BuildServiceProvider()
+        );
 }
