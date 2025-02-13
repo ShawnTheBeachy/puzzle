@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Puzzle.Tests.Unit.TestPlugin;
+using TUnit.Assertions.AssertConditions.Throws;
 
 namespace Puzzle.Tests.Unit;
 
@@ -141,6 +142,36 @@ public sealed class DependencyInjectionTests
         await Assert
             .That(provider.GetService<ITuple>()?.GetType().FullName)
             .IsEqualTo(typeof(ExportedService).FullName);
+    }
+
+    [Test]
+    public async Task PluginService_ShouldBeRegisteredInIsolation()
+    {
+        // Arrange.
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    {
+                        $"{PluginOptions.SectionName}:{nameof(PluginOptions.Locations)}:0",
+                        GlobalHooks.PluginsPath
+                    },
+                }
+            )
+            .Build();
+        var services = new ServiceCollection();
+
+        // Act.
+        var provider = services.AddPlugins(configuration).BuildServiceProvider();
+
+        // Assert.
+        var resolve = () => provider.GetRequiredService<ICloneable>();
+        await Assert
+            .That(resolve)
+            .ThrowsExactly<InvalidOperationException>()
+            .WithMessage(
+                $"Unable to resolve service for type '{typeof(IFormatProvider)}' while attempting to activate '{typeof(ExportedDependentService)}'."
+            );
     }
 
     [Test]

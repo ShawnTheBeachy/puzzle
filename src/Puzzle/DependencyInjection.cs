@@ -59,11 +59,7 @@ public static class DependencyInjection
                 };
                 var serviceDescriptor = isHostedService
                     ? ServiceDescriptor.Singleton(typeof(IHostedService), implementationFactory)
-                    : new ServiceDescriptor(
-                        isHostedService ? type : serviceType!,
-                        implementationFactory,
-                        isHostedService ? ServiceLifetime.Singleton : lifetime!.Value
-                    );
+                    : new ServiceDescriptor(serviceType!, implementationFactory, lifetime!.Value);
 
                 serviceCollection.Add(serviceDescriptor);
             }

@@ -14,6 +14,17 @@ public sealed class ExportedService : ITuple
     public int Length => 1;
 }
 
+[Service<ICloneable>(ServiceLifetime.Transient)]
+public sealed class ExportedDependentService : ICloneable
+{
+    public ExportedDependentService(IFormatProvider provider)
+    {
+        _ = provider;
+    }
+
+    public object Clone() => this;
+}
+
 public sealed class ExportedServiceWithoutAttribute : IFormatProvider
 {
     public object? GetFormat(Type? formatType) => null;
