@@ -13,7 +13,7 @@ public sealed class PluginExtensionsTests
     public async Task Bootstrap_ShouldBootstrapHttpContext()
     {
         // Arrange.
-        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!);
+        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!, null);
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns((HttpContext?)null);
         var baseServices = Substitute.For<IServiceProvider>();
@@ -31,7 +31,7 @@ public sealed class PluginExtensionsTests
     public async Task Bootstrap_ShouldBootstrapLogging()
     {
         // Arrange.
-        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!);
+        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!, null);
         var loggerFactory = Substitute.For<ILoggerFactory>();
         var baseServices = Substitute.For<IServiceProvider>();
         baseServices.GetService(typeof(ILoggerFactory)).Returns(loggerFactory);

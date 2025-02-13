@@ -15,7 +15,7 @@ public sealed class PluginBootstrapperTests
     public async Task Bootstrap_ShouldDoNothing_WhenPluginBootstrapperTypeIsNull()
     {
         // Arrange.
-        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!);
+        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!, null);
         var sut = new PluginBootstrapper(plugin);
 
         var services = new ServiceCollection();

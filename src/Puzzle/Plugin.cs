@@ -9,7 +9,7 @@ public sealed class Plugin
     public Assembly Assembly { get; }
     public Type? BootstrapperType { get; }
 
-    public Plugin(ITypeProvider allTypes, Assembly assembly, Type bootstrapperType = null!)
+    public Plugin(ITypeProvider allTypes, Assembly assembly, Type? bootstrapperType)
     {
         AllTypes = allTypes;
         Assembly = assembly;
