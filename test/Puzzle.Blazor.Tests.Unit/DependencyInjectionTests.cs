@@ -11,9 +11,7 @@ public sealed class DependencyInjectionTests
     public async Task AddBlazor_ShouldReplaceComponentActivator_WhenActivatorIsRegistered()
     {
         // Arrange.
-        var services = new ServiceCollection().AddSingleton<IComponentActivator>(
-            Substitute.For<IComponentActivator>()
-        );
+        var services = new ServiceCollection().AddSingleton(Substitute.For<IComponentActivator>());
         var config = new PuzzleConfiguration([], Substitute.For<IConfiguration>(), services);
 
         // Act.
@@ -37,11 +35,11 @@ public sealed class DependencyInjectionTests
         // Arrange.
         var typeProviderA = Substitute.For<ITypeProvider>();
         typeProviderA.GetTypes().Returns([typeof(ComponentA), typeof(string)]);
-        var pluginA = new Plugin(typeProviderA, null!);
+        var pluginA = new Plugin(typeProviderA, null!, null);
 
         var typeProviderB = Substitute.For<ITypeProvider>();
         typeProviderB.GetTypes().Returns([typeof(ComponentB), typeof(int)]);
-        var pluginB = new Plugin(typeProviderB, null!);
+        var pluginB = new Plugin(typeProviderB, null!, null);
 
         var services = new ServiceCollection();
         var config = new PuzzleConfiguration(

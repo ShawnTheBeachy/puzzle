@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Puzzle.Abstractions;
@@ -12,7 +13,7 @@ public sealed class PluginExtensionsTests
     public async Task Bootstrap_ShouldBootstrapHttpContext()
     {
         // Arrange.
-        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!);
+        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!, null);
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns((HttpContext?)null);
         var baseServices = Substitute.For<IServiceProvider>();
@@ -30,7 +31,7 @@ public sealed class PluginExtensionsTests
     public async Task Bootstrap_ShouldBootstrapLogging()
     {
         // Arrange.
-        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!);
+        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!, null);
         var loggerFactory = Substitute.For<ILoggerFactory>();
         var baseServices = Substitute.For<IServiceProvider>();
         baseServices.GetService(typeof(ILoggerFactory)).Returns(loggerFactory);
@@ -43,5 +44,35 @@ public sealed class PluginExtensionsTests
         using var asserts = Assert.Multiple();
         await Assert.That(bootstrapped.GetService<ILoggerFactory>()).IsEqualTo(loggerFactory);
         await Assert.That(bootstrapped.GetService<ILogger<PluginExtensionsTests>>()).IsNotNull();
+    }
+
+    [Test]
+    public async Task Bootstrap_ShouldBootstrapPluginBootstrapper()
+    {
+        // Arrange.
+        var plugin = new Plugin(
+            Substitute.For<ITypeProvider>(),
+            typeof(PluginExtensionsTests).Assembly,
+            typeof(TestBootstrapper)
+        );
+        var baseServices = Substitute.For<IServiceProvider>();
+        var services = new ServiceCollection();
+
+        // Act.
+        var bootstrapped = plugin.Bootstrap(services, baseServices);
+
+        // Assert.
+        await Assert.That(bootstrapped.GetService<string>()).IsEqualTo(TestBootstrapper.Foo);
+    }
+}
+
+file sealed class TestBootstrapper : IPluginBootstrapper
+{
+    public const string Foo = "foo";
+
+    public IServiceCollection Bootstrap(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton<string>(Foo);
+        return services;
     }
 }

@@ -11,10 +11,9 @@ public sealed class LoggingBootstrapperTests
     {
         // Arrange.
         var services = new ServiceCollection();
-        var sut = new LoggingBootstrapper();
 
         // Act.
-        var bootstrapped = sut.Bootstrap(
+        var bootstrapped = LoggingBootstrapper.Bootstrap(
             services,
             Substitute.For<IServiceProvider>(),
             (sc, _) => sc.BuildServiceProvider()
@@ -34,10 +33,9 @@ public sealed class LoggingBootstrapperTests
         var baseProvider = Substitute.For<IServiceProvider>();
         baseProvider.GetService(typeof(ILoggerFactory)).Returns(loggerFactory);
         var services = new ServiceCollection();
-        var sut = new LoggingBootstrapper();
 
         // Act.
-        var bootstrapped = sut.Bootstrap(
+        var bootstrapped = LoggingBootstrapper.Bootstrap(
             services,
             baseProvider,
             (sc, _) => sc.BuildServiceProvider()
