@@ -16,8 +16,16 @@ internal static class AssemblyScanning
         options
             .Locations.Select(location => new DirectoryInfo(location))
             .SelectMany(directory =>
-                directory.EnumerateDirectories("*", SearchOption.TopDirectoryOnly)
-            )
+            {
+                try
+                {
+                    return directory.EnumerateDirectories("*", SearchOption.TopDirectoryOnly);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    return [];
+                }
+            })
             .SelectMany(directory =>
                 directory.EnumerateFiles("*.dll", SearchOption.TopDirectoryOnly)
             );

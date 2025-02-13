@@ -35,7 +35,7 @@ public static class DependencyInjection
         var startupTimer = new Stopwatch();
         startupTimer.Start();
 
-        var loader = new PluginLoader(options!, logger);
+        var loader = new PluginLoader(options, logger);
 
         foreach (var plugin in loader.Plugins())
         {
@@ -45,24 +45,27 @@ public static class DependencyInjection
                     continue;
 
                 var isHostedService = type.IsAssignableTo(typeof(IHostedService));
-                serviceCollection.Add(
-                    new ServiceDescriptor(
-                        serviceType!,
-                        sp =>
-                        {
-                            var services = new ServiceCollection().Add(
-                                new ServiceDescriptor(
-                                    type,
-                                    type,
-                                    isHostedService ? ServiceLifetime.Singleton : lifetime!.Value
-                                )
-                            );
-                            var provider = plugin.Bootstrap(services, sp);
-                            return provider.GetRequiredService(type);
-                        },
+                var implementationFactory = (IServiceProvider sp) =>
+                {
+                    var services = new ServiceCollection().Add(
+                        new ServiceDescriptor(
+                            type,
+                            type,
+                            isHostedService ? ServiceLifetime.Singleton : lifetime!.Value
+                        )
+                    );
+                    var provider = plugin.Bootstrap(services, sp);
+                    return provider.GetRequiredService(type);
+                };
+                var serviceDescriptor = isHostedService
+                    ? ServiceDescriptor.Singleton(typeof(IHostedService), implementationFactory)
+                    : new ServiceDescriptor(
+                        isHostedService ? type : serviceType!,
+                        implementationFactory,
                         isHostedService ? ServiceLifetime.Singleton : lifetime!.Value
-                    )
-                );
+                    );
+
+                serviceCollection.Add(serviceDescriptor);
             }
         }
 
@@ -71,17 +74,17 @@ public static class DependencyInjection
         );
 
         startupTimer.Stop();
-        CheckStartupThreshold(startupTimer.Elapsed, options!, logger);
+        CheckStartupThreshold(startupTimer.Elapsed, options, logger);
         return serviceCollection;
     }
 
     private static void CheckStartupThreshold(
         TimeSpan elapsed,
-        PluginOptions options,
+        PluginOptions? options,
         ILogger logger
     )
     {
-        if (options.StartupThreshold is null)
+        if (options?.StartupThreshold is null)
             return;
 
         if (elapsed < options.StartupThreshold)

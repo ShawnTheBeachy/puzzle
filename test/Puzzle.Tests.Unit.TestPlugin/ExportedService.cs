@@ -13,3 +13,8 @@ public sealed class ExportedService : ITuple
 
     public int Length => 1;
 }
+
+public sealed class ExportedServiceWithoutAttribute : IFormatProvider
+{
+    public object? GetFormat(Type? formatType) => null;
+}
