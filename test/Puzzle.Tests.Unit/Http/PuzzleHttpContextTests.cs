@@ -35,7 +35,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.Connection).IsEqualTo(connectionInfo);
+        await Assert.That(sut.Connection).IsSameReferenceAs(connectionInfo);
     }
 
     [Test]
@@ -50,7 +50,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.Features).IsEqualTo(features);
+        await Assert.That(sut.Features).IsSameReferenceAs(features);
     }
 
     [Test]
@@ -65,7 +65,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.Items).IsEqualTo(items);
+        await Assert.That(sut.Items).IsSameReferenceAs(items);
     }
 
     [Test]
@@ -80,7 +80,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.Request).IsEqualTo(request);
+        await Assert.That(sut.Request).IsSameReferenceAs(request);
     }
 
     [Test]
@@ -110,7 +110,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.RequestServices).IsNotEqualTo(services);
+        await Assert.That(sut.RequestServices).IsNotSameReferenceAs(services);
     }
 
     [Test]
@@ -125,7 +125,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.Response).IsEqualTo(response);
+        await Assert.That(sut.Response).IsSameReferenceAs(response);
     }
 
     [Test]
@@ -140,7 +140,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.Session).IsEqualTo(session);
+        await Assert.That(sut.Session).IsSameReferenceAs(session);
     }
 
     [Test]
@@ -155,7 +155,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.TraceIdentifier).IsEqualTo(traceId);
+        await Assert.That(sut.TraceIdentifier).IsSameReferenceAs(traceId);
     }
 
     [Test]
@@ -170,7 +170,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.User).IsEqualTo(user);
+        await Assert.That(sut.User).IsSameReferenceAs(user);
     }
 
     [Test]
@@ -185,7 +185,7 @@ public sealed class PuzzleHttpContextTests
         var sut = new PuzzleHttpContext(@base);
 
         // Assert.
-        await Assert.That(sut.WebSockets).IsEqualTo(webSockets);
+        await Assert.That(sut.WebSockets).IsSameReferenceAs(webSockets);
     }
 
     [Test]
@@ -200,7 +200,7 @@ public sealed class PuzzleHttpContextTests
         sut.Items = items;
 
         // Assert.
-        await Assert.That(@base.Items).IsEqualTo(items);
+        await Assert.That(@base.Items).IsSameReferenceAs(items);
     }
 
     [Test]
@@ -231,8 +231,8 @@ public sealed class PuzzleHttpContextTests
 
         // Assert.
         using var asserts = Assert.Multiple();
-        await Assert.That(@base.RequestServices).IsNotEqualTo(services);
-        await Assert.That(sut.RequestServices).IsEqualTo(services);
+        await Assert.That(@base.RequestServices).IsNotSameReferenceAs(services);
+        await Assert.That(sut.RequestServices).IsSameReferenceAs(services);
     }
 
     [Test]
@@ -247,7 +247,7 @@ public sealed class PuzzleHttpContextTests
         sut.Session = session;
 
         // Assert.
-        await Assert.That(sut.Session).IsEqualTo(session);
+        await Assert.That(sut.Session).IsSameReferenceAs(session);
     }
 
     [Test]
@@ -262,7 +262,7 @@ public sealed class PuzzleHttpContextTests
         sut.TraceIdentifier = traceId;
 
         // Assert.
-        await Assert.That(sut.TraceIdentifier).IsEqualTo(traceId);
+        await Assert.That(sut.TraceIdentifier).IsSameReferenceAs(traceId);
     }
 
     [Test]
@@ -277,6 +277,6 @@ public sealed class PuzzleHttpContextTests
         sut.User = user;
 
         // Assert.
-        await Assert.That(sut.User).IsEqualTo(user);
+        await Assert.That(sut.User).IsSameReferenceAs(user);
     }
 }

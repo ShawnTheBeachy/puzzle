@@ -13,7 +13,12 @@ public sealed class PluginExtensionsTests
     public async Task Bootstrap_ShouldBootstrapHttpContext()
     {
         // Arrange.
-        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!, null);
+        var plugin = new Plugin(
+            Substitute.For<ITypeProvider>(),
+            typeof(PluginExtensionsTests).Assembly,
+            null,
+            Substitute.For<IPluginMetadata>()
+        );
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns((HttpContext?)null);
         var baseServices = Substitute.For<IServiceProvider>();
@@ -31,7 +36,12 @@ public sealed class PluginExtensionsTests
     public async Task Bootstrap_ShouldBootstrapLogging()
     {
         // Arrange.
-        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!, null);
+        var plugin = new Plugin(
+            Substitute.For<ITypeProvider>(),
+            typeof(PluginExtensionsTests).Assembly,
+            null,
+            Substitute.For<IPluginMetadata>()
+        );
         var loggerFactory = Substitute.For<ILoggerFactory>();
         var baseServices = Substitute.For<IServiceProvider>();
         baseServices.GetService(typeof(ILoggerFactory)).Returns(loggerFactory);
@@ -42,7 +52,9 @@ public sealed class PluginExtensionsTests
 
         // Assert.
         using var asserts = Assert.Multiple();
-        await Assert.That(bootstrapped.GetService<ILoggerFactory>()).IsEqualTo(loggerFactory);
+        await Assert
+            .That(bootstrapped.GetService<ILoggerFactory>())
+            .IsSameReferenceAs(loggerFactory);
         await Assert.That(bootstrapped.GetService<ILogger<PluginExtensionsTests>>()).IsNotNull();
     }
 
@@ -53,7 +65,8 @@ public sealed class PluginExtensionsTests
         var plugin = new Plugin(
             Substitute.For<ITypeProvider>(),
             typeof(PluginExtensionsTests).Assembly,
-            typeof(TestBootstrapper)
+            typeof(TestBootstrapper),
+            Substitute.For<IPluginMetadata>()
         );
         var baseServices = Substitute.For<IServiceProvider>();
         var services = new ServiceCollection();

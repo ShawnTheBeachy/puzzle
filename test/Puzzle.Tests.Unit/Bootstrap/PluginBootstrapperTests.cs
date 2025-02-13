@@ -15,7 +15,12 @@ public sealed class PluginBootstrapperTests
     public async Task Bootstrap_ShouldDoNothing_WhenPluginBootstrapperTypeIsNull()
     {
         // Arrange.
-        var plugin = new Plugin(Substitute.For<ITypeProvider>(), null!, null);
+        var plugin = new Plugin(
+            Substitute.For<ITypeProvider>(),
+            typeof(PluginBootstrapperTests).Assembly,
+            null,
+            Substitute.For<IPluginMetadata>()
+        );
         var sut = new PluginBootstrapper(plugin);
 
         var services = new ServiceCollection();
@@ -35,7 +40,8 @@ public sealed class PluginBootstrapperTests
         var plugin = new Plugin(
             Substitute.For<ITypeProvider>(),
             typeof(PluginBootstrapperTests).Assembly,
-            typeof(TestBootstrapper)
+            typeof(TestBootstrapper),
+            Substitute.For<IPluginMetadata>()
         );
         var sut = new PluginBootstrapper(plugin);
 
@@ -63,7 +69,8 @@ public sealed class PluginBootstrapperTests
         var plugin = new Plugin(
             Substitute.For<ITypeProvider>(),
             typeof(PluginBootstrapperTests).Assembly,
-            typeof(TestBootstrapper)
+            typeof(TestBootstrapper),
+            Substitute.For<IPluginMetadata>()
         );
         var sut = new PluginBootstrapper(plugin);
 
