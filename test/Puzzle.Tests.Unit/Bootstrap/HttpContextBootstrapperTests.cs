@@ -15,7 +15,7 @@ public sealed class HttpContextBootstrapperTests
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(Substitute.For<HttpContext>());
         var baseServices = Substitute.For<IServiceProvider>();
-        baseServices.GetService(Arg.Is(typeof(IHttpContextAccessor))).Returns(httpContextAccessor);
+        baseServices.GetService(typeof(IHttpContextAccessor)).Returns(httpContextAccessor);
 
         // Act.
         var services = new ServiceCollection();
@@ -63,7 +63,7 @@ public sealed class HttpContextBootstrapperTests
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns((HttpContext?)null);
         var baseServices = Substitute.For<IServiceProvider>();
-        baseServices.GetService(Arg.Is(typeof(IHttpContextAccessor))).Returns(httpContextAccessor);
+        baseServices.GetService(typeof(IHttpContextAccessor)).Returns(httpContextAccessor);
         var services = new ServiceCollection();
 
         // Act.
@@ -90,7 +90,7 @@ public sealed class HttpContextBootstrapperTests
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(Substitute.For<HttpContext>());
         var baseServices = Substitute.For<IServiceProvider>();
-        baseServices.GetService(Arg.Is(typeof(IHttpContextAccessor))).Returns(httpContextAccessor);
+        baseServices.GetService(typeof(IHttpContextAccessor)).Returns(httpContextAccessor);
         var services = new ServiceCollection();
 
         // Act.
