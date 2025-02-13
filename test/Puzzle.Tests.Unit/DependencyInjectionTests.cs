@@ -47,11 +47,7 @@ public sealed class DependencyInjectionTests
         // Arrange.
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    { "Plugins:Locations", "[]" },
-                    { "Plugins:Threshold", "00:00:00" },
-                }
+                new Dictionary<string, string?> { { "Plugins:StartupThreshold", "00:00:00.00000" } }
             )
             .Build();
         var logger = new TestableLogger<PluginLoader>();
