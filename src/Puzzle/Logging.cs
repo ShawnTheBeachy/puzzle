@@ -10,4 +10,7 @@ public static partial class Logging
         string plugin,
         string pluginId
     );
+
+    [LoggerMessage(LogLevel.Warning, "Plugin initialization took {Elapsed}")]
+    public static partial void StartupThresholdWarning(this ILogger logger, TimeSpan elapsed);
 }

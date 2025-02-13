@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Puzzle.Abstractions;
 
 namespace Puzzle.Bootstrap;
 
@@ -17,7 +16,7 @@ internal static class LoggingBootstrapper
         var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
 
         if (loggerFactory is not null)
-            serviceCollection.Replace(ServiceDescriptor.Singleton<ILoggerFactory>(loggerFactory));
+            serviceCollection.Replace(ServiceDescriptor.Singleton(loggerFactory));
 
         return next(serviceCollection, serviceProvider);
     }

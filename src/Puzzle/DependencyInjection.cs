@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,11 +29,13 @@ public static class DependencyInjection
         var options = configuration
             .GetRequiredSection(PluginOptions.SectionName)
             .Get<PluginOptions>();
-        using var loggingServices = new ServiceCollection().AddLogging().BuildServiceProvider();
-        var loader = new PluginLoader(
-            options!,
-            loggingServices.GetRequiredService<ILogger<PluginLoader>>()
-        );
+
+        using var loggingServices = serviceCollection.GetLoggingServices();
+        var logger = loggingServices.GetRequiredService<ILogger<PluginLoader>>();
+        var startupTimer = new Stopwatch();
+        startupTimer.Start();
+
+        var loader = new PluginLoader(options!, logger);
 
         foreach (var plugin in loader.Plugins())
         {
@@ -66,8 +69,29 @@ public static class DependencyInjection
         configure?.Invoke(
             new PuzzleConfiguration(loader.Plugins(), configuration, serviceCollection)
         );
+
+        startupTimer.Stop();
+        CheckStartupThreshold(startupTimer.Elapsed, options!, logger);
         return serviceCollection;
     }
+
+    private static void CheckStartupThreshold(
+        TimeSpan elapsed,
+        PluginOptions options,
+        ILogger logger
+    )
+    {
+        if (options.StartupThreshold is null)
+            return;
+
+        if (elapsed < options.StartupThreshold)
+            return;
+
+        logger.StartupThresholdWarning(elapsed);
+    }
+
+    private static ServiceProvider GetLoggingServices(this IServiceCollection serviceCollection) =>
+        serviceCollection.AddLogging().BuildServiceProvider();
 
     private static bool TryFindService(
         this Type type,

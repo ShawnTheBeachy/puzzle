@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Puzzle.Tests.Unit.TestPlugin;
 
 namespace Puzzle.Tests.Unit;
@@ -38,5 +39,29 @@ public sealed class DependencyInjectionTests
         await Assert
             .That(provider.GetService<ITuple>()?.GetType().FullName)
             .IsEqualTo(typeof(ExportedService).FullName);
+    }
+
+    [Test]
+    public async Task Warning_ShouldBeLogged_WhenStartupTakesLongerThanSpecifiedThreshold()
+    {
+        // Arrange.
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    { "Plugins:Locations", "[]" },
+                    { "Plugins:Threshold", "00:00:00" },
+                }
+            )
+            .Build();
+        var logger = new TestableLogger<PluginLoader>();
+        var services = new ServiceCollection();
+        services.AddSingleton<ILogger<PluginLoader>>(logger);
+
+        // Act.
+        services.AddPlugins(configuration);
+
+        // Assert.
+        await Assert.That(logger.LogMessages).HasCount().EqualToOne();
     }
 }
