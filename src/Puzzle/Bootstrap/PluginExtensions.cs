@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Puzzle.Abstractions;
 
 namespace Puzzle.Bootstrap;
 
@@ -15,6 +14,7 @@ public static class PluginExtensions
         [
             HttpContextBootstrapper.Bootstrap,
             LoggingBootstrapper.Bootstrap,
+            new PluginBootstrapper(plugin).Bootstrap,
         ];
         var bootstrap = bootstrappers.Aggregate(
             (BootstrapperNext)((sc, _) => sc.BuildServiceProvider()),
