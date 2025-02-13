@@ -11,14 +11,14 @@ public static class PluginExtensions
         IServiceProvider serviceProvider
     )
     {
-        IReadOnlyList<IBootstrapperInternal> bootstrappers =
+        IReadOnlyList<Bootstrapper> bootstrappers =
         [
-            new HttpContextBootstrapper(),
-            new LoggingBootstrapper(),
+            HttpContextBootstrapper.Bootstrap,
+            LoggingBootstrapper.Bootstrap,
         ];
         var bootstrap = bootstrappers.Aggregate(
-            (Bootstrapper)((sc, _) => sc.BuildServiceProvider()),
-            (next, bootstrapper) => (sc, sp) => bootstrapper.Bootstrap(sc, sp, next)
+            (BootstrapperNext)((sc, _) => sc.BuildServiceProvider()),
+            (next, bootstrapper) => (sc, sp) => bootstrapper(sc, sp, next)
         );
         return bootstrap(serviceCollection, serviceProvider);
     }

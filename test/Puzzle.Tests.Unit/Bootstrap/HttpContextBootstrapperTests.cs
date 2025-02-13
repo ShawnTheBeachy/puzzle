@@ -11,7 +11,6 @@ public sealed class HttpContextBootstrapperTests
     public async Task Bootstrap_ShouldAssignConstructedServicesToHttpContextRequestServices()
     {
         // Arrange.
-        var sut = new HttpContextBootstrapper();
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(Substitute.For<HttpContext>());
         var baseServices = Substitute.For<IServiceProvider>();
@@ -20,7 +19,7 @@ public sealed class HttpContextBootstrapperTests
         // Act.
         var services = new ServiceCollection();
         IServiceProvider? serviceProvider = null;
-        var bootstrapped = sut.Bootstrap(
+        var bootstrapped = HttpContextBootstrapper.Bootstrap(
             services,
             baseServices,
             (sc, _) => serviceProvider = sc.BuildServiceProvider()
@@ -38,12 +37,11 @@ public sealed class HttpContextBootstrapperTests
     public async Task Bootstrap_ShouldDoNothing_WhenBaseServiceProviderDoesNotHaveHttpContextAccessor()
     {
         // Arrange.
-        var sut = new HttpContextBootstrapper();
         var baseServices = Substitute.For<IServiceProvider>();
         var services = new ServiceCollection();
 
         // Act.
-        var bootstrapped = sut.Bootstrap(
+        var bootstrapped = HttpContextBootstrapper.Bootstrap(
             services,
             baseServices,
             (sc, _) => sc.BuildServiceProvider()
@@ -59,7 +57,6 @@ public sealed class HttpContextBootstrapperTests
     public async Task Bootstrap_ShouldRegisterHttpContextAccessorWithNullHttpContext_WhenBaseServiceProviderHttpContextAccessorHasNullHttpContext()
     {
         // Arrange.
-        var sut = new HttpContextBootstrapper();
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns((HttpContext?)null);
         var baseServices = Substitute.For<IServiceProvider>();
@@ -67,7 +64,7 @@ public sealed class HttpContextBootstrapperTests
         var services = new ServiceCollection();
 
         // Act.
-        var bootstrapped = sut.Bootstrap(
+        var bootstrapped = HttpContextBootstrapper.Bootstrap(
             services,
             baseServices,
             (sc, _) => sc.BuildServiceProvider()
@@ -86,7 +83,6 @@ public sealed class HttpContextBootstrapperTests
     public async Task Bootstrap_ShouldRegisterHttpContextAccessorWithPuzzleHttpContext_WhenBaseServiceProviderHasHttpContextAccessor()
     {
         // Arrange.
-        var sut = new HttpContextBootstrapper();
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(Substitute.For<HttpContext>());
         var baseServices = Substitute.For<IServiceProvider>();
@@ -94,7 +90,7 @@ public sealed class HttpContextBootstrapperTests
         var services = new ServiceCollection();
 
         // Act.
-        var bootstrapped = sut.Bootstrap(
+        var bootstrapped = HttpContextBootstrapper.Bootstrap(
             services,
             baseServices,
             (sc, _) => sc.BuildServiceProvider()

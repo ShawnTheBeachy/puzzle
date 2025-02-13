@@ -5,12 +5,12 @@ using Puzzle.Abstractions;
 
 namespace Puzzle.Bootstrap;
 
-internal sealed class LoggingBootstrapper : IBootstrapperInternal
+internal static class LoggingBootstrapper
 {
-    public IServiceProvider Bootstrap(
+    public static IServiceProvider Bootstrap(
         IServiceCollection serviceCollection,
         IServiceProvider serviceProvider,
-        Bootstrapper next
+        BootstrapperNext next
     )
     {
         serviceCollection.AddLogging();

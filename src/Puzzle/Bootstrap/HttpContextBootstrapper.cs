@@ -5,12 +5,12 @@ using Puzzle.Http;
 
 namespace Puzzle.Bootstrap;
 
-internal sealed class HttpContextBootstrapper : IBootstrapperInternal
+internal static class HttpContextBootstrapper
 {
-    public IServiceProvider Bootstrap(
+    public static IServiceProvider Bootstrap(
         IServiceCollection serviceCollection,
         IServiceProvider serviceProvider,
-        Bootstrapper next
+        BootstrapperNext next
     )
     {
         var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
