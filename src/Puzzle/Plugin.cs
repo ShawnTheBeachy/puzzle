@@ -28,19 +28,29 @@ public sealed class Plugin
     internal static bool TryCreate(Assembly assembly, out Plugin? plugin)
     {
         plugin = null;
-        var exportedTypes = assembly.ExportedTypes.ToArray();
-        var metadataType = exportedTypes.FirstOrDefault(typeof(IPluginMetadata).IsAssignableFrom);
 
-        if (metadataType is null)
+        try
+        {
+            var exportedTypes = assembly.ExportedTypes.ToArray();
+            var metadataType = exportedTypes.FirstOrDefault(
+                typeof(IPluginMetadata).IsAssignableFrom
+            );
+
+            if (metadataType is null)
+                return false;
+
+            plugin = new Plugin(
+                new TypeProvider(exportedTypes),
+                assembly,
+                exportedTypes.FirstOrDefault(typeof(IPluginBootstrapper).IsAssignableFrom),
+                (IPluginMetadata)Activator.CreateInstance(metadataType)!
+            );
+            return true;
+        }
+        catch
+        {
             return false;
-
-        plugin = new Plugin(
-            new TypeProvider(exportedTypes),
-            assembly,
-            exportedTypes.FirstOrDefault(typeof(IPluginBootstrapper).IsAssignableFrom),
-            (IPluginMetadata)Activator.CreateInstance(metadataType)!
-        );
-        return true;
+        }
     }
 
     private sealed class TypeProvider : ITypeProvider

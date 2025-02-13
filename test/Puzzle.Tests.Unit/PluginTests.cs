@@ -1,4 +1,6 @@
-﻿namespace Puzzle.Tests.Unit;
+﻿using Puzzle.Tests.Unit.TestPlugin;
+
+namespace Puzzle.Tests.Unit;
 
 public sealed class PluginTests
 {
@@ -6,7 +8,7 @@ public sealed class PluginTests
     public async Task TryCreate_ShouldCreatePlugin_WhenAssemblyExportsPluginMetadata()
     {
         // Arrange.
-        var assembly = typeof(PluginTests).Assembly;
+        var assembly = typeof(ExportedMetadata).Assembly;
 
         // Act.
         _ = Plugin.TryCreate(assembly, out var plugin);
@@ -18,8 +20,8 @@ public sealed class PluginTests
         await Assert.That(plugin.Name).IsEqualTo(new ExportedMetadata().Name);
         await Assert
             .That(plugin.Assembly.Location)
-            .IsEqualTo(typeof(PluginTests).Assembly.Location);
-        await Assert.That(plugin.AllTypes.GetTypes()).Contains(x => x == typeof(PluginTests));
+            .IsEqualTo(typeof(ExportedMetadata).Assembly.Location);
+        await Assert.That(plugin.AllTypes.GetTypes()).Contains(x => x == typeof(ExportedMetadata));
         await Assert.That(plugin.BootstrapperType).IsEqualTo(typeof(ExportedBootstrapper));
     }
 
@@ -42,7 +44,7 @@ public sealed class PluginTests
     public async Task TryCreate_ShouldReturnTrue_WhenAssemblyExportsPluginMetadata()
     {
         // Arrange.
-        var assembly = typeof(PluginTests).Assembly;
+        var assembly = typeof(ExportedMetadata).Assembly;
 
         // Act.
         var success = Plugin.TryCreate(assembly, out _);

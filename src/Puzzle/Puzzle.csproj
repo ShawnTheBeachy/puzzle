@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
         <InternalsVisibleTo Include="Puzzle.Blazor.Tests.Unit"/>
         <InternalsVisibleTo Include="Puzzle.Tests.Unit"/>
     </ItemGroup>
