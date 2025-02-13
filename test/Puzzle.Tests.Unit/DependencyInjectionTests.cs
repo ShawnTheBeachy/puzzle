@@ -58,6 +58,11 @@ public sealed class DependencyInjectionTests
         services.AddPlugins(configuration);
 
         // Assert.
+        using var asserts = Assert.Multiple();
         await Assert.That(logger.LogMessages).HasCount().EqualToOne();
+        await Assert.That(logger.LogMessages[0].LogLevel).IsEqualTo(LogLevel.Warning);
+        await Assert
+            .That(logger.LogMessages[0].Message)
+            .Matches(Logging.Messages.StartupThresholdWarning.Replace("{Elapsed}", "*"));
     }
 }

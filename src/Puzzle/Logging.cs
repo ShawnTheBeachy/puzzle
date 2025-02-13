@@ -4,7 +4,7 @@ namespace Puzzle;
 
 internal static partial class Logging
 {
-    [LoggerMessage(LogLevel.Debug, Messages.DiscoveredPlugin)]
+    [LoggerMessage(LogLevel.Information, Messages.DiscoveredPlugin)]
     public static partial void DiscoveredPlugin(
         this ILogger logger,
         string plugin,
