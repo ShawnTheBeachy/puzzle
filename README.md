@@ -53,7 +53,7 @@ The locations in which Puzzle will look for plugins. Each plugin must be nested 
     ├── plugins                    # The directory which you will include in `Locations`
     │   ├── com.company.pluginA    # The sub-directory for a plugin
     |   |   |── PluginA.dll
-    |   |   └── ...
+    |   |   └── ...                # Other plugin files
     │   ├── com.company.pluginB    # The sub-directory for another plugin
     |   |   |── PluginB.dll
     |   |   └── ...                # Other plugin files
