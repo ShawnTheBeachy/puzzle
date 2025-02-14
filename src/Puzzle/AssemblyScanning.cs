@@ -1,4 +1,5 @@
 using System.Reflection;
+using Puzzle.Options;
 
 namespace Puzzle;
 

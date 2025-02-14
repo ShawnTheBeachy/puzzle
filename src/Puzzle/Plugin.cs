@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Puzzle.Abstractions;
+using Puzzle.Options;
 
 namespace Puzzle;
 

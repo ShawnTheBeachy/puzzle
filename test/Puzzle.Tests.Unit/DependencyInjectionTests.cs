@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Puzzle.Abstractions;
+using Puzzle.Options;
 using Puzzle.Tests.Unit.TestPlugin;
 using TUnit.Assertions.AssertConditions.Throws;
 

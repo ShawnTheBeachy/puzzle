@@ -1,3 +1,5 @@
+using Puzzle.Options;
+
 namespace Puzzle.Tests.Unit;
 
 public sealed class AssemblyScanningTests
