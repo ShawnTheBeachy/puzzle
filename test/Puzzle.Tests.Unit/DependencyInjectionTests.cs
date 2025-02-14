@@ -103,7 +103,8 @@ public sealed class DependencyInjectionTests
                 }
             )
             .Build();
-        var pluginsSection = configuration
+        var pluginsSection = configuration.GetRequiredSection(PuzzleOptions.SectionName);
+        var pluginOptionsSection = configuration
             .GetRequiredSection(PuzzleOptions.SectionName)
             .GetRequiredSection(new ExportedMetadata().Id)
             .GetRequiredSection("Options");
@@ -117,7 +118,7 @@ public sealed class DependencyInjectionTests
 
         // Assert.
         var bootstrapper = (ExportedBootstrapper)provider.GetRequiredService<IPluginBootstrapper>();
-        await Assert.That(bootstrapper.Configuration).IsSameReferenceAs(pluginsSection);
+        await Assert.That(bootstrapper.Configuration).IsSameReferenceAs(pluginOptionsSection);
     }
 
     [Test]
