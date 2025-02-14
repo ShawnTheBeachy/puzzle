@@ -107,6 +107,7 @@ The `IConfiguration` object which is passed in has two sources:
 
 # Puzzle.Blazor
 Download from [NuGet](https://www.nuget.org/packages/asdfDEV.Puzzle.Blazor).
+
 If you want to support Blazor components in your application host, you will need to install `Puzzle.Blazor`.
 
 ```c#
