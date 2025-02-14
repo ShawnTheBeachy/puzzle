@@ -1,2 +1,2 @@
-# puzzle
-A plugin system for .NET.
+# Puzzle
+A simple plugin system for .NET.
