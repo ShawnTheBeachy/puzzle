@@ -8,6 +8,7 @@ var services = new ServiceCollection().AddPlugins(configuration).BuildServicePro
 
 var path = args[0];
 var fileInfo = new FileInfo(path);
+using var fs = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read);
 
 var parsers = services.GetServices<IFileParser>().ToArray();
 
@@ -19,7 +20,7 @@ foreach (var parser in parsers)
 
     try
     {
-        if (!parser.TryParse(fileInfo, out var parsed))
+        if (!parser.TryParse(fileInfo, fs, out var parsed))
             continue;
 
         Console.WriteLine(parsed);

@@ -1,0 +1,19 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using FileParser.Abstractions
+@inject ILogger<Home> Logger;
+@inject IEnumerable<IFileParser> Parsers
+
+<PageTitle>Home</PageTitle>
+<InputFile OnChange="@SingleUpload" />
+
+@if (_file is not null)
+{
+    foreach (var parser in Parsers)
+    {
+        if (parser.TryParse(new FileInfo(_file!.Name), _stream!, out var parsed))
+        {
+            @parser.Display(parsed!)
+        }
+    }
+}

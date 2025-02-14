@@ -1,0 +1,30 @@
+@if (DataSet.Rows.Count < 1)
+{
+    <p>No data to display</p>
+    return;
+}
+
+<table>
+    <thead>
+        <tr>
+            @foreach (var column in DataSet.Rows[0].Columns)
+            {
+                <th>@column</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @if (DataSet.Rows.Count > 1)
+        {
+            @foreach (var row in DataSet.Rows.Skip(1))
+            {
+                <tr>
+                    @foreach (var column in row.Columns)
+                    {
+                        <td>@column</td>
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>

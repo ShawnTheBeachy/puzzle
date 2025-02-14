@@ -1,17 +1,18 @@
 namespace FileParser.Plugins.Csv;
 
-internal sealed class DataSet
+public sealed class DataSet
 {
     private readonly List<Row> _rows = [];
+    internal IReadOnlyList<Row> Rows => _rows;
 
-    public Row AddRow()
+    internal Row AddRow()
     {
         var row = new Row(this);
         _rows.Add(row);
         return row;
     }
 
-    public int GetWidth(int index)
+    internal int GetWidth(int index)
     {
         var width = 0;
 
@@ -33,6 +34,7 @@ internal sealed class Row
 {
     private readonly List<string> _columns = [];
     private readonly DataSet _dataSet;
+    internal IReadOnlyList<string> Columns => _columns;
 
     public Row(DataSet dataSet)
     {
