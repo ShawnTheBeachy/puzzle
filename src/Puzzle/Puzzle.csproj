@@ -11,7 +11,6 @@
         <NoWarn>$(NoWarn);CS1591</NoWarn>
         <EnablePackageValidation>true</EnablePackageValidation>
         <PackageId>asdfDEV.Puzzle</PackageId>
-        <Version>0.1.0</Version>
         <Authors>ShawnSeanShaun</Authors>
         <Company>asdfDEV</Company>
         <PackageDescription>A basic plugin system for .NET applications.</PackageDescription>
@@ -55,11 +54,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="../../README.md">
+        <Content Include="..\..\README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </Content>
-        <Content Include="../../assets/nuget-package-icon.png">
+        <Content Include="..\..\assets\nuget-package-icon.png">
             <Pack>true</Pack>
             <PackagePath>/assets/nuget-package-icon.png</PackagePath>
         </Content>
