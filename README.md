@@ -69,9 +69,28 @@ Download from [NuGet](https://www.nuget.org/packages/asdfDEV.Puzzle.Abstractions
 If you are creating a plugin, this is the package for you.
 
 ## `Service<>`
-For a plugin service to be registered you must mark it with the `Service<>` attribute. NOTE: This should *only* be used for services which are implementing an abstraction. For example, if your target host application is expecting an implementation of `IDataSource` and you are implementing it via `MyDataSource`, you should mark `MyDataSource` with `Service<IDataSource>`. If `MyDataSource` relies on another service in your project, e.g. `MyConnectionBuilder`, you should *not* mark `MyConnectionBuilder` with the `Service<>` attribute. 
-
+For a plugin service to be registered you must mark it with the `Service<>` attribute.
 The `Service<>` attribute takes a `Lifetime` argument. This can be `Scoped`, `Singleton`, or `Transient`.
+
+NOTE: This should *only* be used for services which are implementing an abstraction for the host app. Let's suppose that you have the following setup:
+
+    .
+    ├── ...
+    ├── PluginHostApp
+    |   └── ...
+    ├── PluginAbstractions
+    │   ├── IDataSource.cs
+    |   └── ...
+    ├── SqlitePlugin
+    │   ├── Abstractions
+    │   |    ├── IConnectionFactory.cs
+    |   |    └── ...
+    │   ├── SqliteConnectionFactory.cs
+    │   ├── SqliteDataSource.cs
+    |   └── ...
+    └── ...
+
+`PluginHostApp` is going to be looking for implementations of `IDataSource`, which your plugin is going to provide via `SqliteDataSource`. Because you want `SqliteDataSource` to be picked up by Puzzle, you must mark it with the `Service<IDataSource>` attribute. Suppose that `SqliteDataSource` has a dependency on `IConnectionFactory`, which is implemented by `SqliteConnectionFactory`. You would not mark `SqliteConnectionFactory` with the `Service<IConnectionFactory>` attribute because `PluginHostApp` does not need to know about the `IConnectionFactory`. Instead, you should bootstrap `IConnectionFactory -> SqliteConnectionFactory` as detailed below.
 
 Your service must be `public` for Puzzle to pick it up.
 
