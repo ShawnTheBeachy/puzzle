@@ -36,6 +36,7 @@ public static class DependencyInjection
         startupTimer.Start();
 
         var loader = new PluginLoader(options, logger);
+        serviceCollection.AddSingleton<IPluginLoader>(loader);
 
         foreach (var plugin in loader.Plugins())
         {

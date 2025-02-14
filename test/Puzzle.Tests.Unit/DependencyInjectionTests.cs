@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Puzzle.Abstractions;
 using Puzzle.Tests.Unit.TestPlugin;
 using TUnit.Assertions.AssertConditions.Throws;
 
@@ -67,6 +68,28 @@ public sealed class DependencyInjectionTests
             .Contains(x =>
                 x.ServiceType == typeof(IHostedService) && x.Lifetime == ServiceLifetime.Singleton
             );
+    }
+
+    [Test]
+    public async Task PluginLoader_ShouldBeRegisteredAsSingleton()
+    {
+        // Arrange.
+        var services = new ServiceCollection();
+        var config = Substitute.For<IConfiguration>();
+
+        // Act.
+        var provider = services.AddPlugins(config).BuildServiceProvider();
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert
+            .That(services)
+            .Contains(x =>
+                x.ServiceType == typeof(IPluginLoader)
+                && x
+                    is { ImplementationInstance: PluginLoader, Lifetime: ServiceLifetime.Singleton }
+            );
+        await Assert.That(provider.GetService<IPluginLoader>()).IsTypeOf<PluginLoader>();
     }
 
     [Test]
