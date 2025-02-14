@@ -6,8 +6,14 @@ namespace Puzzle.Tests.Unit.TestPlugin;
 
 public sealed class ExportedBootstrapper : IPluginBootstrapper
 {
-    public IServiceCollection Bootstrap(
-        IServiceCollection services,
-        IConfiguration configuration
-    ) => services;
+    public IConfiguration? Configuration { get; set; }
+    public IServiceCollection? Services { get; set; }
+
+    public IServiceCollection Bootstrap(IServiceCollection services, IConfiguration configuration)
+    {
+        Configuration = configuration;
+        Services = services;
+        services.AddSingleton<IPluginBootstrapper>(this);
+        return services;
+    }
 }

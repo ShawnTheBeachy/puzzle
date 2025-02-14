@@ -81,6 +81,82 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
+    public async Task PluginBootstrapper_ShouldBeExecutedOnPluginsOwnOptionsConfiguration_WhenIsolatePluginsIsSetToFalseInConfiguration()
+    {
+        // Arrange.
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
+                        GlobalHooks.PluginsPath
+                    },
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.IsolatePlugins)}",
+                        "false"
+                    },
+                    {
+                        $"{PuzzleOptions.SectionName}:{new ExportedMetadata().Id}:Options:Test",
+                        "true"
+                    },
+                }
+            )
+            .Build();
+        var pluginsSection = configuration
+            .GetRequiredSection(PuzzleOptions.SectionName)
+            .GetRequiredSection(new ExportedMetadata().Id)
+            .GetRequiredSection("Options");
+        var testableConfiguration = Substitute.For<IConfigurationManager>();
+        testableConfiguration.GetSection(PuzzleOptions.SectionName).Returns(pluginsSection);
+
+        var services = new ServiceCollection();
+
+        // Act.
+        var provider = services.AddPlugins(testableConfiguration).BuildServiceProvider();
+
+        // Assert.
+        var bootstrapper = (ExportedBootstrapper)provider.GetRequiredService<IPluginBootstrapper>();
+        await Assert.That(bootstrapper.Configuration).IsSameReferenceAs(pluginsSection);
+    }
+
+    [Test]
+    public async Task PluginBootstrapper_ShouldBeExecutedOnServiceCollection_WhenIsolatePluginsIsSetToFalseInConfiguration()
+    {
+        // Arrange.
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
+                        GlobalHooks.PluginsPath
+                    },
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.IsolatePlugins)}",
+                        "false"
+                    },
+                }
+            )
+            .Build();
+        var services = new ServiceCollection();
+
+        // Act.
+        var provider = services.AddPlugins(configuration).BuildServiceProvider();
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert.That(services).Contains(x => x.ServiceType == typeof(IPluginBootstrapper));
+        var service = services.First(x => x.ServiceType == typeof(IPluginBootstrapper));
+        await Assert.That(service.ImplementationInstance).IsTypeOf<ExportedBootstrapper>();
+        var bootstrapper = provider.GetService<IPluginBootstrapper>();
+        await Assert.That(bootstrapper).IsTypeOf<ExportedBootstrapper>();
+        await Assert
+            .That(((ExportedBootstrapper)bootstrapper!).Services)
+            .IsSameReferenceAs(services);
+    }
+
+    [Test]
     public async Task PluginLoader_ShouldBeRegisteredAsSingleton()
     {
         // Arrange.

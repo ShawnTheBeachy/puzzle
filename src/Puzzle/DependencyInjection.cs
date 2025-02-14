@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Puzzle.Abstractions;
+using Puzzle.Bootstrap;
 using Puzzle.Options;
 
 namespace Puzzle;
@@ -33,10 +34,8 @@ public static class DependencyInjection
         var loader = new PluginLoader(configuration, logger);
         serviceCollection.AddSingleton<IPluginLoader>(loader);
 
-        var options = configuration.Get<PuzzleOptions>();
-
         foreach (var plugin in loader.Plugins())
-            HandlePlugin(plugin, serviceCollection, options);
+            HandlePlugin(plugin, serviceCollection, configuration);
 
         configure?.Invoke(
             new PuzzleConfiguration(loader.Plugins(), configuration, serviceCollection)
@@ -64,11 +63,20 @@ public static class DependencyInjection
     private static void HandlePlugin(
         Plugin plugin,
         IServiceCollection serviceCollection,
-        PuzzleOptions? options
+        IConfiguration configuration
     )
     {
+        var options = configuration.Get<PuzzleOptions>();
+
         if (plugin.IsDisabled)
             return;
+
+        if (!(options?.IsolatePlugins ?? true))
+            serviceCollection = plugin.Bootstrap(
+                serviceCollection,
+                (IConfiguration?)configuration.GetSection(plugin.Id)?.GetSection("Options")
+                    ?? new ConfigurationBuilder().Build()
+            );
 
         foreach (var type in plugin.AllTypes.GetTypes())
         {
