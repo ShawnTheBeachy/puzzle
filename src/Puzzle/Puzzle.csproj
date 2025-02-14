@@ -17,7 +17,7 @@
         <PackageProjectUrl>https://github.com/ShawnTheBeachy/puzzle</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>.net;plugin;</PackageTags>
-        <PackageIcon>assets/nuget-package-icon.png</PackageIcon>
+        <PackageIcon>/assets/nuget-package-icon.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
@@ -51,6 +51,10 @@
         <Content Include="../../README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
+        </Content>
+        <Content Include="../../assets/nuget-package-icon.png">
+            <Pack>true</Pack>
+            <PackagePath>/assets/nuget-package-icon.png</PackagePath>
         </Content>
     </ItemGroup>
 
