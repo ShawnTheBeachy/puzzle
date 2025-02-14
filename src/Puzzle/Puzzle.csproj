@@ -13,6 +13,7 @@
         <RepositoryUrl>https://github.com/ShawnTheBeachy/puzzle</RepositoryUrl>
         <PackageProjectUrl>https://github.com/ShawnTheBeachy/puzzle</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>.net;plugin;</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
