@@ -44,10 +44,12 @@
 
   <ItemGroup>
     <Content Include="..\..\README.md">
+      <Link>.nuget\%(FileName)%(Extension)</Link>
       <Pack>true</Pack>
       <PackagePath>README.md</PackagePath>
     </Content>
     <Content Include="..\..\assets\nuget-package-icon.png">
+      <Link>.nuget\%(FileName)%(Extension)</Link>
       <Pack>true</Pack>
       <PackagePath>/assets/nuget-package-icon.png</PackagePath>
     </Content>
