@@ -11,7 +11,7 @@
         <NoWarn>$(NoWarn);CS1591</NoWarn>
         <EnablePackageValidation>true</EnablePackageValidation>
         <PackageId>asdfDEV.Puzzle</PackageId>
-        <Version>0.1.0</Version>
+        <Version>0.1.1</Version>
         <Authors>ShawnSeanShaun</Authors>
         <Company>asdfDEV</Company>
         <PackageDescription>A basic plugin system for .NET applications.</PackageDescription>

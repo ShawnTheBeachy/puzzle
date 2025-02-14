@@ -1,4 +1,4 @@
-name: Publish NuGet package
+name: Publish NuGet packages
 on:
   workflow_dispatch:
   pull_request:
@@ -19,7 +19,7 @@ defaults:
 
 jobs:
   create_nuget:
-    name: Create NuGet package
+    name: Create NuGet packages
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -33,17 +33,22 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
-      - run: dotnet pack src/Puzzle/Puzzle.csproj --configuration Release --output ${{ env.NuGetDirectory }}
-      - name: Upload package
+      - name: Pack main project
+        run: dotnet pack src/Puzzle/Puzzle.csproj --configuration Release --output ${{ env.NuGetDirectory }}
+      - name: Pack abstractions project
+        run: dotnet pack src/Puzzle.Abstractions/Puzzle.Abstractions.csproj --configuration Release --output ${{ env.NuGetDirectory }}
+      - name: Pack Blazor project
+        run: dotnet pack src/Puzzle.Blazor/Puzzle.Blazor.csproj --configuration Release --output ${{ env.NuGetDirectory }}
+      - name: Upload packages
         uses: actions/upload-artifact@v4
         with:
-          name: nuget
+          name: blazor
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 2
           path: ${{ env.NuGetDirectory }}/*.nupkg
 
   validate_nuget:
-    name: Validate NuGet package
+    name: Validate NuGet packages
     runs-on: ubuntu-latest
     needs: [ create_nuget ]
     strategy:
@@ -54,10 +59,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
-      - name: Download NuGet package
+      - name: Download NuGet packages
         uses: actions/download-artifact@v4
         with:
-          name: nuget
+          merge-multiple: true
           path: ${{ env.NuGetDirectory }}
       - name: Install NuGet validator
         run: dotnet tool update Meziantou.Framework.NuGetPackageValidation.Tool --global
@@ -99,7 +104,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: nuget
+          merge-multiple: true
           path: ${{ env.NuGetDirectory }}
       - name: Set up .NET SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v4
