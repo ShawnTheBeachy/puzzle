@@ -38,8 +38,3 @@ jobs:
         run: dotnet test --no-restore --no-build --verbosity normal
     env:
       DescribeTests: false
-  publish:
-    name: Publish NuGet package
-    runs-on: ubuntu-latest
-    strategy:
-      
