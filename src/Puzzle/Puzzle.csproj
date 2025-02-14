@@ -11,7 +11,7 @@
         <Company>asdfDEV</Company>
         <PackageDescription>A basic plugin system for .NET applications.</PackageDescription>
         <RepositoryUrl>https://github.com/ShawnTheBeachy/puzzle</RepositoryUrl>
-        <ProjectUrl>https://github.com/ShawnTheBeachy/puzzle</ProjectUrl>
+        <PackageProjectUrl>https://github.com/ShawnTheBeachy/puzzle</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
