@@ -14,6 +14,7 @@
         <PackageProjectUrl>https://github.com/ShawnTheBeachy/puzzle</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>.net;plugin;</PackageTags>
+        <PackageIconUrl>https://github.com/ShawnTheBeachy/puzzle/tree/main/assets/nuget-package-icon.png</PackageIconUrl>
     </PropertyGroup>
 
     <ItemGroup>
