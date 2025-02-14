@@ -1,4 +1,4 @@
-namespace Puzzle;
+namespace Puzzle.Options;
 
 internal sealed record PluginOptions
 {

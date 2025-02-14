@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Runtime.Loader;
+using Puzzle.Options;
 
 namespace Puzzle;
 
@@ -8,7 +10,9 @@ internal static class AssemblyScanning
         ScanAssemblyFiles(options)
             .Select(assemblyFile =>
             {
-                var loadContext = new PluginLoadContext(assemblyFile.FullName);
+                var loadContext = options.IsolatePlugins
+                    ? new PluginLoadContext(assemblyFile.FullName)
+                    : AssemblyLoadContext.Default;
                 return loadContext.LoadFromAssemblyPath(assemblyFile.FullName);
             });
 

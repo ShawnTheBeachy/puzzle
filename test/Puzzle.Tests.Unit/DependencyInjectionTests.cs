@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Puzzle.Abstractions;
+using Puzzle.Options;
 using Puzzle.Tests.Unit.TestPlugin;
 using TUnit.Assertions.AssertConditions.Throws;
 
@@ -13,7 +14,7 @@ namespace Puzzle.Tests.Unit;
 public sealed class DependencyInjectionTests
 {
     [Test]
-    public async Task AddPlugins_ShouldNotThrow_WhenPlugionSectionIsNotInConfiguration()
+    public async Task AddPlugins_ShouldNotThrow_WhenPluginSectionIsNotInConfiguration()
     {
         // Arrange.
         var configuration = new ConfigurationBuilder().Build();
@@ -77,6 +78,78 @@ public sealed class DependencyInjectionTests
             .Contains(x =>
                 x.ServiceType == typeof(IHostedService) && x.Lifetime == ServiceLifetime.Singleton
             );
+    }
+
+    [Test]
+    public async Task PluginBootstrapper_ShouldBeExecutedOnPluginsOwnOptionsConfiguration_WhenIsolatePluginsIsSetToFalseInConfiguration()
+    {
+        // Arrange.
+        const string expectedValue = "Bar";
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
+                        GlobalHooks.PluginsPath
+                    },
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.IsolatePlugins)}",
+                        "false"
+                    },
+                    {
+                        $"{PuzzleOptions.SectionName}:{new ExportedMetadata().Id}:Options:Foo",
+                        expectedValue
+                    },
+                }
+            )
+            .Build();
+        var services = new ServiceCollection();
+
+        // Act.
+        var provider = services.AddPlugins(configuration).BuildServiceProvider();
+
+        // Assert.
+        var bootstrapper = (ExportedBootstrapper)provider.GetRequiredService<IPluginBootstrapper>();
+        await Assert
+            .That(bootstrapper.Configuration?.GetValue<string>("Foo"))
+            .IsEqualTo(expectedValue);
+    }
+
+    [Test]
+    public async Task PluginBootstrapper_ShouldBeExecutedOnServiceCollection_WhenIsolatePluginsIsSetToFalseInConfiguration()
+    {
+        // Arrange.
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
+                        GlobalHooks.PluginsPath
+                    },
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.IsolatePlugins)}",
+                        "false"
+                    },
+                }
+            )
+            .Build();
+        var services = new ServiceCollection();
+
+        // Act.
+        var provider = services.AddPlugins(configuration).BuildServiceProvider();
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert.That(services).Contains(x => x.ServiceType == typeof(IPluginBootstrapper));
+        var service = services.First(x => x.ServiceType == typeof(IPluginBootstrapper));
+        await Assert.That(service.ImplementationInstance).IsTypeOf<ExportedBootstrapper>();
+        var bootstrapper = provider.GetService<IPluginBootstrapper>();
+        await Assert.That(bootstrapper).IsTypeOf<ExportedBootstrapper>();
+        await Assert
+            .That(((ExportedBootstrapper)bootstrapper!).Services)
+            .IsSameReferenceAs(services);
     }
 
     [Test]
@@ -177,7 +250,7 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
-    public async Task PluginService_ShouldBeRegisteredInIsolation()
+    public async Task PluginService_ShouldBeRegisteredInIsolation_WhenIsolatedIsNotOverridenInConfiguration()
     {
         // Arrange.
         var configuration = new ConfigurationBuilder()
@@ -259,6 +332,37 @@ public sealed class DependencyInjectionTests
         await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(ITuple));
         var provider = services.BuildServiceProvider();
         await Assert.That(provider.GetService<ITuple>()).IsNull();
+    }
+
+    [Test]
+    public async Task PluginService_ShouldNotBeRegisteredInIsolation_WhenIsolatePluginsIsSetToFalseInConfiguration()
+    {
+        // Arrange.
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
+                        GlobalHooks.PluginsPath
+                    },
+                    { $"{PuzzleOptions.SectionName}:IsolatePlugins", "false" },
+                }
+            )
+            .Build();
+        var services = new ServiceCollection();
+
+        // Act.
+        var provider = services
+            .AddSingleton(Substitute.For<IFormatProvider>())
+            .AddPlugins(configuration)
+            .BuildServiceProvider();
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        var service = services.First(x => x.ServiceType == typeof(ICloneable));
+        await Assert.That(service.ImplementationType).IsEqualTo(typeof(ExportedDependentService));
+        await Assert.That(provider.GetService<ICloneable>()).IsTypeOf<ExportedDependentService>();
     }
 
     [Test]

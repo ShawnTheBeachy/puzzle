@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Puzzle.Abstractions;
+using Puzzle.Options;
 
 namespace Puzzle;
 
