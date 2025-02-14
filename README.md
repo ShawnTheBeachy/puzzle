@@ -2,7 +2,6 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ShawnTheBeachy/puzzle/publish-nuget.yml)
 ![NuGet Version](https://img.shields.io/nuget/v/asdfDEV.Puzzle)
 ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/ShawnTheBeachy/puzzle)
-![GitHub License](https://img.shields.io/github/license/ShawnTheBeachy/puzzle)
 ![GitHub repo size](https://img.shields.io/github/repo-size/ShawnTheBeachy/puzzle)
 
 Puzzle is a simple plugin system for .NET. It does not aim to be a fancy, best-to-ever-do-it package. It is for projects where *simple*, *basic* plugin support is needed.
