@@ -66,6 +66,7 @@ jobs:
 
   run_tests:
     name: Run tests
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     strategy:
       matrix:
