@@ -18,7 +18,7 @@ internal sealed class PluginLoader : IPluginLoader
             return;
 
         StartupThreshold = options.StartupThreshold;
-        var pluginAssemblies = AssemblyScanning.ScanAssemblies(options);
+        var pluginAssemblies = AssemblyScanning.ScanAssemblies(options, logger);
 
         foreach (var assembly in pluginAssemblies)
         {

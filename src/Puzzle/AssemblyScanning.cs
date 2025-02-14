@@ -1,13 +1,14 @@
 using System.Reflection;
 using System.Runtime.Loader;
+using Microsoft.Extensions.Logging;
 using Puzzle.Options;
 
 namespace Puzzle;
 
 internal static class AssemblyScanning
 {
-    public static IEnumerable<Assembly> ScanAssemblies(PuzzleOptions options) =>
-        ScanAssemblyFiles(options)
+    public static IEnumerable<Assembly> ScanAssemblies(PuzzleOptions options, ILogger logger) =>
+        ScanAssemblyFiles(options, logger)
             .Select(assemblyFile =>
             {
                 var loadContext = options.IsolatePlugins
@@ -16,7 +17,7 @@ internal static class AssemblyScanning
                 return loadContext.LoadFromAssemblyPath(assemblyFile.FullName);
             });
 
-    private static IEnumerable<FileInfo> ScanAssemblyFiles(PuzzleOptions options) =>
+    private static IEnumerable<FileInfo> ScanAssemblyFiles(PuzzleOptions options, ILogger logger) =>
         options
             .Locations.Select(location => new DirectoryInfo(location))
             .SelectMany(directory =>
@@ -27,6 +28,7 @@ internal static class AssemblyScanning
                 }
                 catch (DirectoryNotFoundException)
                 {
+                    logger.PluginLocationNotExists(directory.ToString());
                     return [];
                 }
             })
