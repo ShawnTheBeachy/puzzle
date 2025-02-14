@@ -31,6 +31,8 @@ builder.AddPlugins();
 ...
 ```
 
+`AddPlugins()` should be called as the last step before calling `builder.Build()`.
+
 ## Configuration
 Puzzle configuration options should be nested under a `Plugins` section.
 
