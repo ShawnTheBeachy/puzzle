@@ -8,7 +8,7 @@
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);CS1591</NoWarn>
         <EnablePackageValidation>true</EnablePackageValidation>
-        <PackageId>Puzzle</PackageId>
+        <PackageId>asdfDEV.Puzzle</PackageId>
         <Version>0.1.0</Version>
         <Authors>ShawnSeanShaun</Authors>
         <Company>asdfDEV</Company>
