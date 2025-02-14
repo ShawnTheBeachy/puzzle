@@ -96,20 +96,25 @@ public sealed class DependencyInjectionTests
                         $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.IsolatePlugins)}",
                         "false"
                     },
-                    {
-                        $"{PuzzleOptions.SectionName}:{new ExportedMetadata().Id}:Options:Test",
-                        "true"
-                    },
                 }
             )
             .Build();
+
         var pluginsSection = configuration.GetRequiredSection(PuzzleOptions.SectionName);
-        var pluginOptionsSection = configuration
-            .GetRequiredSection(PuzzleOptions.SectionName)
-            .GetRequiredSection(new ExportedMetadata().Id)
-            .GetRequiredSection("Options");
+        var testablePluginsSection = Substitute.For<IConfigurationSection>();
+        testablePluginsSection.Get<PuzzleOptions>().Returns(pluginsSection.Get<PuzzleOptions>());
+        testablePluginsSection.Key.Returns(pluginsSection.Key);
+
+        var pluginOptionsSection = Substitute.For<IConfigurationSection>();
+
+        var pluginSection = Substitute.For<IConfigurationSection>();
+        pluginSection.Key.Returns(new ExportedMetadata().Id);
+        pluginSection.GetSection("Options").Returns(pluginOptionsSection);
+
+        testablePluginsSection.GetSection(new ExportedMetadata().Id).Returns(pluginSection);
+
         var testableConfiguration = Substitute.For<IConfigurationManager>();
-        testableConfiguration.GetSection(PuzzleOptions.SectionName).Returns(pluginsSection);
+        testableConfiguration.GetSection(PuzzleOptions.SectionName).Returns(testablePluginsSection);
 
         var services = new ServiceCollection();
 
