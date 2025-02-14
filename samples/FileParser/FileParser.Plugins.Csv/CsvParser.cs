@@ -11,13 +11,14 @@ public sealed class CsvParser : IFileParser
     public bool TryParse(FileInfo fileInfo, out object? parsed)
     {
         parsed = null;
+        var extension = fileInfo.Extension.ToUpperInvariant();
 
-        if (fileInfo.Extension.ToUpperInvariant() != ".CSV")
+        if (extension is not (".CSV" or ".TSV"))
             return false;
 
         using var parser = new TextFieldParser(fileInfo.FullName);
         parser.TextFieldType = FieldType.Delimited;
-        parser.SetDelimiters(",");
+        parser.SetDelimiters(extension == ".TSV" ? "\t" : ",");
 
         var dataSet = new DataSet();
 
