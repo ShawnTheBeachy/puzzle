@@ -2,11 +2,9 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Puzzle.Abstractions;
-using Puzzle.Bootstrap;
 using Puzzle.Options;
 
 namespace Puzzle;
@@ -35,8 +33,10 @@ public static class DependencyInjection
         var loader = new PluginLoader(configuration, logger);
         serviceCollection.AddSingleton<IPluginLoader>(loader);
 
+        var options = configuration.Get<PuzzleOptions>();
+
         foreach (var plugin in loader.Plugins())
-            HandlePlugin(plugin, serviceCollection);
+            HandlePlugin(plugin, serviceCollection, options);
 
         configure?.Invoke(
             new PuzzleConfiguration(loader.Plugins(), configuration, serviceCollection)
@@ -61,34 +61,25 @@ public static class DependencyInjection
     private static ServiceProvider GetLoggingServices(this IServiceCollection serviceCollection) =>
         serviceCollection.AddLogging().BuildServiceProvider();
 
-    private static void HandlePlugin(Plugin plugin, IServiceCollection serviceCollection)
+    private static void HandlePlugin(
+        Plugin plugin,
+        IServiceCollection serviceCollection,
+        PuzzleOptions? options
+    )
     {
         if (plugin.IsDisabled)
             return;
 
         foreach (var type in plugin.AllTypes.GetTypes())
         {
-            if (!type.TryFindService(out var serviceType, out var lifetime))
+            if (
+                !type.TryFindService(out var serviceType, out var lifetime)
+                || serviceType is null
+                || lifetime is null
+            )
                 continue;
 
-            var isHostedService = type.IsAssignableTo(typeof(IHostedService));
-            var implementationFactory = (IServiceProvider sp) =>
-            {
-                var services = new ServiceCollection().Add(
-                    new ServiceDescriptor(
-                        type,
-                        type,
-                        isHostedService ? ServiceLifetime.Singleton : lifetime!.Value
-                    )
-                );
-                var provider = plugin.Bootstrap(services, sp);
-                return provider.GetRequiredService(type);
-            };
-            var serviceDescriptor = isHostedService
-                ? ServiceDescriptor.Singleton(typeof(IHostedService), implementationFactory)
-                : new ServiceDescriptor(serviceType!, implementationFactory, lifetime!.Value);
-
-            serviceCollection.Add(serviceDescriptor);
+            serviceCollection.AddService(serviceType, type, lifetime.Value, plugin, options);
         }
     }
 

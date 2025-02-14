@@ -263,7 +263,7 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
-    public async Task PluginService_ShouldNotBeRegisteredInIsolation_WhenIsolatedIsSetToFalseInConfiguration()
+    public async Task PluginService_ShouldNotBeRegisteredInIsolation_WhenIsolatePluginsIsSetToFalseInConfiguration()
     {
         // Arrange.
         var configuration = new ConfigurationBuilder()
@@ -274,10 +274,7 @@ public sealed class DependencyInjectionTests
                         $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
                         GlobalHooks.PluginsPath
                     },
-                    {
-                        $"{PuzzleOptions.SectionName}:{new ExportedMetadata().Id}:Isolated",
-                        "false"
-                    },
+                    { $"{PuzzleOptions.SectionName}:IsolatePlugins", "false" },
                 }
             )
             .Build();
@@ -292,7 +289,7 @@ public sealed class DependencyInjectionTests
         // Assert.
         using var asserts = Assert.Multiple();
         var service = services.First(x => x.ServiceType == typeof(ICloneable));
-        await Assert.That(service.ImplementationType).IsEqualTo(typeof(ExportedService));
+        await Assert.That(service.ImplementationType).IsEqualTo(typeof(ExportedDependentService));
         await Assert.That(provider.GetService<ICloneable>()).IsTypeOf<ExportedDependentService>();
     }
 
