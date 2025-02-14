@@ -23,40 +23,35 @@ public static class DependencyInjection
         Action<PuzzleConfiguration>? configure = null
     )
     {
-        var configurationSection = configuration.GetSection(PuzzleOptions.SectionName);
-        serviceCollection.AddOptions<PuzzleOptions>().Bind(configurationSection);
-        var options = configurationSection.Get<PuzzleOptions>();
+        configuration = configuration.GetSection(PuzzleOptions.SectionName);
+        serviceCollection.AddOptions<PuzzleOptions>().Bind(configuration);
 
         using var loggingServices = serviceCollection.GetLoggingServices();
         var logger = loggingServices.GetRequiredService<ILogger<PluginLoader>>();
         var startupTimer = new Stopwatch();
         startupTimer.Start();
 
-        var loader = new PluginLoader(options, logger);
+        var loader = new PluginLoader(configuration, logger);
         serviceCollection.AddSingleton<IPluginLoader>(loader);
 
         foreach (var plugin in loader.Plugins())
-            HandlePlugin(plugin, serviceCollection, configurationSection);
+            HandlePlugin(plugin, serviceCollection);
 
         configure?.Invoke(
             new PuzzleConfiguration(loader.Plugins(), configuration, serviceCollection)
         );
 
         startupTimer.Stop();
-        CheckStartupThreshold(startupTimer.Elapsed, options, logger);
+        CheckStartupThreshold(startupTimer.Elapsed, loader.StartupThreshold, logger);
         return serviceCollection;
     }
 
-    private static void CheckStartupThreshold(
-        TimeSpan elapsed,
-        PuzzleOptions? options,
-        ILogger logger
-    )
+    private static void CheckStartupThreshold(TimeSpan elapsed, TimeSpan? threshold, ILogger logger)
     {
-        if (options?.StartupThreshold is null)
+        if (threshold is null)
             return;
 
-        if (elapsed < options.StartupThreshold)
+        if (elapsed < threshold)
             return;
 
         logger.StartupThresholdWarning(elapsed);
@@ -65,17 +60,9 @@ public static class DependencyInjection
     private static ServiceProvider GetLoggingServices(this IServiceCollection serviceCollection) =>
         serviceCollection.AddLogging().BuildServiceProvider();
 
-    private static void HandlePlugin(
-        Plugin plugin,
-        IServiceCollection serviceCollection,
-        IConfiguration? configuration
-    )
+    private static void HandlePlugin(Plugin plugin, IServiceCollection serviceCollection)
     {
-        var options = new PluginOptions();
-        var pluginSection = configuration?.GetSection(plugin.Id);
-        pluginSection?.Bind(options);
-
-        if (options.Disabled)
+        if (plugin.IsDisabled)
             return;
 
         foreach (var type in plugin.AllTypes.GetTypes())

@@ -27,27 +27,22 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
-    public async Task AddPluginsToHostBuild_ShouldPassHostServicesAndConfiguration()
+    public async Task AddPluginsToHostBuild_ShouldPassHostServices()
     {
         // Arrange.
         var services = new ServiceCollection();
-        var config = Substitute.For<IConfigurationManager>();
         var host = Substitute.For<IHostApplicationBuilder>();
-        host.Configuration.Returns(config);
+        host.Configuration.Returns(Substitute.For<IConfigurationManager>());
         host.Services.Returns(services);
 
         // Act.
         IServiceCollection? passedServices = null;
-        IConfiguration? passedConfig = null;
         host.AddPlugins(x =>
         {
-            passedConfig = x.Configuration;
             passedServices = x.Services;
         });
 
         // Assert.
-        using var asserts = Assert.Multiple();
-        await Assert.That(passedConfig).IsSameReferenceAs(config);
         await Assert.That(passedServices).IsSameReferenceAs(services);
     }
 
@@ -264,6 +259,29 @@ public sealed class DependencyInjectionTests
         await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(ITuple));
         var provider = services.BuildServiceProvider();
         await Assert.That(provider.GetService<ITuple>()).IsNull();
+    }
+
+    [Test]
+    public async Task PuzzleConfigurationSection_ShouldBePassedToConfigAction()
+    {
+        // Arrange.
+        var config = Substitute.For<IConfigurationManager>();
+        var puzzleConfig = Substitute.For<IConfigurationSection>();
+        config.GetSection(PuzzleOptions.SectionName).Returns(puzzleConfig);
+
+        var host = Substitute.For<IHostApplicationBuilder>();
+        host.Configuration.Returns(config);
+        host.Services.Returns(new ServiceCollection());
+
+        // Act.
+        IConfiguration? passedConfig = null;
+        host.AddPlugins(x =>
+        {
+            passedConfig = x.Configuration;
+        });
+
+        // Assert.
+        await Assert.That(passedConfig).IsSameReferenceAs(puzzleConfig);
     }
 
     [Test]

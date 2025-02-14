@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Puzzle.Tests.Unit.TestPlugin;
 
 namespace Puzzle.Tests.Unit;
@@ -12,7 +13,7 @@ public sealed class PluginTests
         var assembly = typeof(ExportedMetadata).Assembly;
 
         // Act.
-        _ = Plugin.TryCreate(assembly, out var plugin);
+        _ = Plugin.TryCreate(assembly, Substitute.For<IConfiguration>(), out var plugin);
 
         // Assert.
         using var asserts = Assert.Multiple();
@@ -36,7 +37,7 @@ public sealed class PluginTests
         var assembly = typeof(string).Assembly;
 
         // Act.
-        var success = Plugin.TryCreate(assembly, out var plugin);
+        var success = Plugin.TryCreate(assembly, Substitute.For<IConfiguration>(), out var plugin);
 
         // Assert.
         using var asserts = Assert.Multiple();
@@ -51,7 +52,20 @@ public sealed class PluginTests
         var assembly = typeof(ExportedMetadata).Assembly;
 
         // Act.
-        var success = Plugin.TryCreate(assembly, out _);
+        var success = Plugin.TryCreate(assembly, Substitute.For<IConfiguration>(), out _);
+
+        // Assert.
+        await Assert.That(success).IsTrue();
+    }
+
+    [Test]
+    public async Task TryCreate_ShouldSetIsDisabledToTrue_WhenPluginIsDisabledInConfiguration()
+    {
+        // Arrange.
+        var assembly = typeof(ExportedMetadata).Assembly;
+
+        // Act.
+        var success = Plugin.TryCreate(assembly, Substitute.For<IConfiguration>(), out _);
 
         // Assert.
         await Assert.That(success).IsTrue();

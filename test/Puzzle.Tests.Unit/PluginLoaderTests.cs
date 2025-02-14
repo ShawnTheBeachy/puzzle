@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Puzzle.Tests.Unit.TestPlugin;
 
 namespace Puzzle.Tests.Unit;
@@ -9,11 +10,18 @@ public sealed class PluginLoaderTests
     public async Task Information_ShouldBeLogged_WhenPluginIsDiscovered()
     {
         // Arrange.
-        var options = new PuzzleOptions { Locations = [GlobalHooks.PluginsPath] };
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    { $"{nameof(PuzzleOptions.Locations)}:0", GlobalHooks.PluginsPath },
+                }
+            )
+            .Build();
         var logger = new TestableLogger<PluginLoader>();
 
         // Act.
-        var sut = new PluginLoader(options, logger);
+        var sut = new PluginLoader(configuration, logger);
 
         // Assert.
         using var asserts = Assert.Multiple();
@@ -32,10 +40,17 @@ public sealed class PluginLoaderTests
     public async Task Plugin_ShouldBeLoaded_WhenItExistsInLocationSpecifiedInOptions()
     {
         // Arrange.
-        var options = new PuzzleOptions { Locations = [GlobalHooks.PluginsPath] };
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    { $"{nameof(PuzzleOptions.Locations)}:0", GlobalHooks.PluginsPath },
+                }
+            )
+            .Build();
 
         // Act.
-        var sut = new PluginLoader(options, Substitute.For<ILogger<PluginLoader>>());
+        var sut = new PluginLoader(configuration, Substitute.For<ILogger<PluginLoader>>());
 
         // Assert.
         using var asserts = Assert.Multiple();

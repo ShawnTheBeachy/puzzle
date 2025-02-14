@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Puzzle.Abstractions;
 
 namespace Puzzle;
@@ -10,6 +11,7 @@ public sealed class Plugin
     public Assembly Assembly { get; }
     public Type? BootstrapperType { get; }
     public string Id { get; }
+    public bool IsDisabled { get; }
     public string Name { get; }
     public string? Version { get; }
 
@@ -17,18 +19,24 @@ public sealed class Plugin
         ITypeProvider allTypes,
         Assembly assembly,
         Type? bootstrapperType,
-        IPluginMetadata metadata
+        IPluginMetadata metadata,
+        bool isDisabled = false
     )
     {
         AllTypes = allTypes;
         Assembly = assembly;
         BootstrapperType = bootstrapperType;
         Id = metadata.Id;
+        IsDisabled = isDisabled;
         Name = metadata.Name;
         Version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
     }
 
-    internal static bool TryCreate(Assembly assembly, out Plugin? plugin)
+    internal static bool TryCreate(
+        Assembly assembly,
+        IConfiguration configuration,
+        out Plugin? plugin
+    )
     {
         plugin = null;
 
@@ -42,11 +50,18 @@ public sealed class Plugin
             if (metadataType is null)
                 return false;
 
+            var metadata = (IPluginMetadata)Activator.CreateInstance(metadataType)!;
+
+            var options = new PluginOptions();
+            var pluginSection = configuration?.GetSection(metadata.Id);
+            pluginSection?.Bind(options);
+
             plugin = new Plugin(
                 new TypeProvider(exportedTypes),
                 assembly,
                 exportedTypes.FirstOrDefault(typeof(IPluginBootstrapper).IsAssignableFrom),
-                (IPluginMetadata)Activator.CreateInstance(metadataType)!
+                metadata,
+                options.Disabled
             );
             return true;
         }
