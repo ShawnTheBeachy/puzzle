@@ -1,10 +1,10 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace Puzzle;
 
 internal static class AssemblyScanning
 {
-    public static IEnumerable<Assembly> ScanAssemblies(PluginOptions options) =>
+    public static IEnumerable<Assembly> ScanAssemblies(PuzzleOptions options) =>
         ScanAssemblyFiles(options)
             .Select(assemblyFile =>
             {
@@ -12,7 +12,7 @@ internal static class AssemblyScanning
                 return loadContext.LoadFromAssemblyPath(assemblyFile.FullName);
             });
 
-    private static IEnumerable<FileInfo> ScanAssemblyFiles(PluginOptions options) =>
+    private static IEnumerable<FileInfo> ScanAssemblyFiles(PuzzleOptions options) =>
         options
             .Locations.Select(location => new DirectoryInfo(location))
             .SelectMany(directory =>

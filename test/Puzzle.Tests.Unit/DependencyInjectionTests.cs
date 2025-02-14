@@ -13,6 +13,20 @@ namespace Puzzle.Tests.Unit;
 public sealed class DependencyInjectionTests
 {
     [Test]
+    public async Task AddPlugins_ShouldNotThrow_WhenPlugionSectionIsNotInConfiguration()
+    {
+        // Arrange.
+        var configuration = new ConfigurationBuilder().Build();
+        var services = new ServiceCollection();
+
+        // Act.
+        var addPlugins = () => services.AddPlugins(configuration);
+
+        // Assert.
+        await Assert.That(addPlugins).ThrowsNothing();
+    }
+
+    [Test]
     public async Task AddPluginsToHostBuild_ShouldPassHostServicesAndConfiguration()
     {
         // Arrange.
@@ -46,7 +60,7 @@ public sealed class DependencyInjectionTests
                 new Dictionary<string, string?>
                 {
                     {
-                        $"{PluginOptions.SectionName}:{nameof(PluginOptions.Locations)}:0",
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
                         GlobalHooks.PluginsPath
                     },
                 }
@@ -105,15 +119,15 @@ public sealed class DependencyInjectionTests
                 new Dictionary<string, string?>
                 {
                     {
-                        $"{PluginOptions.SectionName}:{nameof(PluginOptions.Locations)}:0",
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
                         locationA
                     },
                     {
-                        $"{PluginOptions.SectionName}:{nameof(PluginOptions.Locations)}:1",
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:1",
                         locationB
                     },
                     {
-                        $"{PluginOptions.SectionName}:{nameof(PluginOptions.StartupThreshold)}",
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.StartupThreshold)}",
                         threshold.ToString()
                     },
                 }
@@ -126,7 +140,7 @@ public sealed class DependencyInjectionTests
 
         // Assert.
         var provider = services.BuildServiceProvider();
-        var resolved = provider.GetService<IOptions<PluginOptions>>();
+        var resolved = provider.GetService<IOptions<PuzzleOptions>>();
         using var asserts = Assert.Multiple();
         await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved!.Value.Locations[0]).IsEqualTo(locationA);
@@ -143,7 +157,7 @@ public sealed class DependencyInjectionTests
                 new Dictionary<string, string?>
                 {
                     {
-                        $"{PluginOptions.SectionName}:{nameof(PluginOptions.Locations)}:0",
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
                         GlobalHooks.PluginsPath
                     },
                 }
@@ -176,7 +190,7 @@ public sealed class DependencyInjectionTests
                 new Dictionary<string, string?>
                 {
                     {
-                        $"{PluginOptions.SectionName}:{nameof(PluginOptions.Locations)}:0",
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
                         GlobalHooks.PluginsPath
                     },
                 }
@@ -206,7 +220,7 @@ public sealed class DependencyInjectionTests
                 new Dictionary<string, string?>
                 {
                     {
-                        $"{PluginOptions.SectionName}:{nameof(PluginOptions.Locations)}:0",
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
                         GlobalHooks.PluginsPath
                     },
                 }
@@ -222,6 +236,34 @@ public sealed class DependencyInjectionTests
         await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(IFormatProvider));
         var provider = services.BuildServiceProvider();
         await Assert.That(provider.GetService<IFormatProvider>()).IsNull();
+    }
+
+    [Test]
+    public async Task PluginService_ShouldNotBeRegistered_WhenItIsExportedFromPluginWhichIsDisabledInConfiguration()
+    {
+        // Arrange.
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
+                        GlobalHooks.PluginsPath
+                    },
+                    { $"{PuzzleOptions.SectionName}:{new ExportedMetadata().Id}:Disabled", "true" },
+                }
+            )
+            .Build();
+        var services = new ServiceCollection();
+
+        // Act.
+        services.AddPlugins(configuration);
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(ITuple));
+        var provider = services.BuildServiceProvider();
+        await Assert.That(provider.GetService<ITuple>()).IsNull();
     }
 
     [Test]

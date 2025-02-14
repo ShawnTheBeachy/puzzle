@@ -1,4 +1,4 @@
-﻿namespace Puzzle.Tests.Unit;
+namespace Puzzle.Tests.Unit;
 
 public sealed class AssemblyScanningTests
 {
@@ -6,7 +6,7 @@ public sealed class AssemblyScanningTests
     public async Task ScanAssemblies_ShouldReturnAssembly_WhenItIsInLocationSpecifiedInOptions()
     {
         // Arrange.
-        var options = new PluginOptions
+        var options = new PuzzleOptions
         {
             Locations =
             [
@@ -31,7 +31,7 @@ public sealed class AssemblyScanningTests
     public async Task ScanAssemblies_ShouldSkipLocation_WhenItDoesNotExist()
     {
         // Arrange.
-        var options = new PluginOptions { Locations = ["/usr/plugins"] };
+        var options = new PuzzleOptions { Locations = ["/usr/plugins"] };
 
         // Act.
         var assemblies = AssemblyScanning.ScanAssemblies(options).ToArray();

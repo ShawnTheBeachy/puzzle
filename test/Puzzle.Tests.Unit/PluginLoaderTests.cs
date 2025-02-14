@@ -9,7 +9,7 @@ public sealed class PluginLoaderTests
     public async Task Information_ShouldBeLogged_WhenPluginIsDiscovered()
     {
         // Arrange.
-        var options = new PluginOptions { Locations = [GlobalHooks.PluginsPath] };
+        var options = new PuzzleOptions { Locations = [GlobalHooks.PluginsPath] };
         var logger = new TestableLogger<PluginLoader>();
 
         // Act.
@@ -32,7 +32,7 @@ public sealed class PluginLoaderTests
     public async Task Plugin_ShouldBeLoaded_WhenItExistsInLocationSpecifiedInOptions()
     {
         // Arrange.
-        var options = new PluginOptions { Locations = [GlobalHooks.PluginsPath] };
+        var options = new PuzzleOptions { Locations = [GlobalHooks.PluginsPath] };
 
         // Act.
         var sut = new PluginLoader(options, Substitute.For<ILogger<PluginLoader>>());
