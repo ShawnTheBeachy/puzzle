@@ -89,6 +89,8 @@ public sealed class MyPluginMetadata : IPluginMetadata
 ## Bootstrapping (optional)
 If your plugin requires services to operate you can inject them via an exported `IPluginBootstrapper` implementation. Only one implementation is supported per plugin.
 
+Puzzle will automatically add logging and `IHttpContextAccessor` for you; you should *not* bootstrap them yourself.
+
 ```c#
 public sealed class MyPluginBootstrapper : IPluginBootstrapper
 {
@@ -107,7 +109,7 @@ The `IConfiguration` object which is passed in has two sources:
 # Puzzle.Blazor
 Download from [NuGet](https://www.nuget.org/packages/asdfDEV.Puzzle.Blazor).
 
-If you want to support Blazor components in your application host, you will need to install `Puzzle.Blazor`.
+If you want to support Blazor components in your application host you will need to install `Puzzle.Blazor`.
 
 ```c#
 ...
