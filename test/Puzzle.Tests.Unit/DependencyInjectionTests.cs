@@ -14,7 +14,7 @@ namespace Puzzle.Tests.Unit;
 public sealed class DependencyInjectionTests
 {
     [Test]
-    public async Task AddPlugins_ShouldNotThrow_WhenPlugionSectionIsNotInConfiguration()
+    public async Task AddPlugins_ShouldNotThrow_WhenPluginSectionIsNotInConfiguration()
     {
         // Arrange.
         var configuration = new ConfigurationBuilder().Build();
@@ -84,6 +84,7 @@ public sealed class DependencyInjectionTests
     public async Task PluginBootstrapper_ShouldBeExecutedOnPluginsOwnOptionsConfiguration_WhenIsolatePluginsIsSetToFalseInConfiguration()
     {
         // Arrange.
+        const string expectedValue = "Bar";
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
@@ -96,34 +97,23 @@ public sealed class DependencyInjectionTests
                         $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.IsolatePlugins)}",
                         "false"
                     },
+                    {
+                        $"{PuzzleOptions.SectionName}:{new ExportedMetadata().Id}:Options:Foo",
+                        expectedValue
+                    },
                 }
             )
             .Build();
-
-        var pluginsSection = configuration.GetRequiredSection(PuzzleOptions.SectionName);
-        var testablePluginsSection = Substitute.For<IConfigurationSection>();
-        testablePluginsSection.Get<PuzzleOptions>().Returns(pluginsSection.Get<PuzzleOptions>());
-        testablePluginsSection.Key.Returns(pluginsSection.Key);
-
-        var pluginOptionsSection = Substitute.For<IConfigurationSection>();
-
-        var pluginSection = Substitute.For<IConfigurationSection>();
-        pluginSection.Key.Returns(new ExportedMetadata().Id);
-        pluginSection.GetSection("Options").Returns(pluginOptionsSection);
-
-        testablePluginsSection.GetSection(new ExportedMetadata().Id).Returns(pluginSection);
-
-        var testableConfiguration = Substitute.For<IConfigurationManager>();
-        testableConfiguration.GetSection(PuzzleOptions.SectionName).Returns(testablePluginsSection);
-
         var services = new ServiceCollection();
 
         // Act.
-        var provider = services.AddPlugins(testableConfiguration).BuildServiceProvider();
+        var provider = services.AddPlugins(configuration).BuildServiceProvider();
 
         // Assert.
         var bootstrapper = (ExportedBootstrapper)provider.GetRequiredService<IPluginBootstrapper>();
-        await Assert.That(bootstrapper.Configuration).IsSameReferenceAs(pluginOptionsSection);
+        await Assert
+            .That(bootstrapper.Configuration?.GetValue<string>("Foo"))
+            .IsEqualTo(expectedValue);
     }
 
     [Test]

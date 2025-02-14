@@ -4,7 +4,7 @@ using Puzzle.Abstractions;
 
 namespace Puzzle.Bootstrap;
 
-internal static class PluginExtensions
+public static class PluginExtensions
 {
     public static IServiceProvider Bootstrap(
         this Plugin plugin,

@@ -67,9 +67,4 @@
         </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="nuget\" />
-      <Folder Include="Options\" />
-    </ItemGroup>
-
 </Project>
