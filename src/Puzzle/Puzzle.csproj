@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DebugType>embedded</DebugType>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <Deterministic>true</Deterministic>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);CS1591</NoWarn>
@@ -15,11 +16,16 @@
         <Company>asdfDEV</Company>
         <PackageDescription>A basic plugin system for .NET applications.</PackageDescription>
         <RepositoryUrl>https://github.com/ShawnTheBeachy/puzzle</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <PackageProjectUrl>https://github.com/ShawnTheBeachy/puzzle</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>.net;plugin;</PackageTags>
         <PackageIcon>assets/nuget-package-icon.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <ItemGroup>
