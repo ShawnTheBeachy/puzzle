@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using Puzzle.Options;
 using Puzzle.Tests.Unit.TestPluginA;
 
 namespace Puzzle.Tests.Unit;
@@ -63,11 +64,44 @@ public sealed class PluginTests
     {
         // Arrange.
         var assembly = typeof(ExportedMetadata).Assembly;
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    { $"{new ExportedMetadata().Id}:{nameof(PluginOptions.Disabled)}", "true" },
+                }
+            )
+            .Build();
 
         // Act.
-        var success = Plugin.TryCreate(assembly, Substitute.For<IConfiguration>(), out _);
+        _ = Plugin.TryCreate(assembly, configuration, out var plugin);
 
         // Assert.
-        await Assert.That(success).IsTrue();
+        await Assert.That(plugin!.IsDisabled).IsTrue();
+    }
+
+    [Test]
+    public async Task TryCreate_ShouldSetPriority_WhenPriorityIsSetInConfiguration()
+    {
+        // Arrange.
+        var assembly = typeof(ExportedMetadata).Assembly;
+        const int priority = 5;
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    {
+                        $"{new ExportedMetadata().Id}:{nameof(PluginOptions.Priority)}",
+                        priority.ToString()
+                    },
+                }
+            )
+            .Build();
+
+        // Act.
+        _ = Plugin.TryCreate(assembly, configuration, out var plugin);
+
+        // Assert.
+        await Assert.That(plugin!.Priority).IsEqualTo(priority);
     }
 }

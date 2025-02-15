@@ -10,10 +10,11 @@ public sealed class Plugin
 {
     public ITypeProvider AllTypes { get; }
     public Assembly Assembly { get; }
-    public Type? BootstrapperType { get; }
+    internal Type? BootstrapperType { get; }
     public string Id { get; }
     public bool IsDisabled { get; }
     public string Name { get; }
+    public int? Priority { get; }
     public string? Version { get; }
 
     internal Plugin(
@@ -21,7 +22,8 @@ public sealed class Plugin
         Assembly assembly,
         Type? bootstrapperType,
         IPluginMetadata metadata,
-        bool isDisabled
+        bool isDisabled,
+        int? priority = null // TODO
     )
     {
         AllTypes = allTypes;
@@ -30,6 +32,7 @@ public sealed class Plugin
         Id = metadata.Id;
         IsDisabled = isDisabled;
         Name = metadata.Name;
+        Priority = priority;
         Version = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
     }
 
@@ -54,15 +57,16 @@ public sealed class Plugin
             var metadata = (IPluginMetadata)Activator.CreateInstance(metadataType)!;
 
             var options = new PluginOptions();
-            var pluginSection = configuration?.GetSection(metadata.Id);
-            pluginSection?.Bind(options);
+            var pluginSection = configuration.GetSection(metadata.Id);
+            pluginSection.Bind(options);
 
             plugin = new Plugin(
                 new TypeProvider(exportedTypes),
                 assembly,
                 exportedTypes.FirstOrDefault(typeof(IPluginBootstrapper).IsAssignableFrom),
                 metadata,
-                options.Disabled
+                options.Disabled,
+                options.Priority
             );
             return true;
         }
