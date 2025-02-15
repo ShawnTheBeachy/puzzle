@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Puzzle.Abstractions;
 using Puzzle.Options;
+using Puzzle.Tests.Unit.TestPlugin;
 using Puzzle.Tests.Unit.TestPlugin.Abstractions;
-using Puzzle.Tests.Unit.TestPluginA;
 using TUnit.Assertions.AssertConditions.Throws;
 
 namespace Puzzle.Tests.Unit;

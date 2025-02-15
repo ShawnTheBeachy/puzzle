@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle", "src\Puzzle\Puzzle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle.Tests.Unit", "test\Puzzle.Tests.Unit\Puzzle.Tests.Unit.csproj", "{4EAB23CB-F359-49E2-AFB6-863745198626}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle.Tests.Unit.TestPluginA", "test\Puzzle.Tests.Unit.TestPluginA\Puzzle.Tests.Unit.TestPluginA.csproj", "{33DB30AC-6AC2-4D33-9A1F-10F92C0EE2CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle.Tests.Unit.TestPlugin", "test\Puzzle.Tests.Unit.TestPlugin\Puzzle.Tests.Unit.TestPlugin.csproj", "{33DB30AC-6AC2-4D33-9A1F-10F92C0EE2CF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{6E8BDAD0-36DC-485E-A8D8-764AF673D858}"
 EndProject
@@ -34,8 +34,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileParser.BlazorApp", "samples\FileParser\FileParser.BlazorApp\FileParser.BlazorApp.csproj", "{0A24BB1C-F5B3-4E6E-8DF7-6A98A262B2B9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle.Tests.Unit.TestPlugin.Abstractions", "test\Puzzle.Tests.Unit.TestPlugin.Abstractions\Puzzle.Tests.Unit.TestPlugin.Abstractions.csproj", "{DBD22237-A4E5-4673-A220-EAC6E1FC8405}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle.Tests.Unit.TestPluginB", "test\Puzzle.Tests.Unit.TestPluginB\Puzzle.Tests.Unit.TestPluginB.csproj", "{DAAE63B2-B785-449A-ADF8-D0E2A04915A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -94,10 +92,6 @@ Global
 		{DBD22237-A4E5-4673-A220-EAC6E1FC8405}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBD22237-A4E5-4673-A220-EAC6E1FC8405}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBD22237-A4E5-4673-A220-EAC6E1FC8405}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DAAE63B2-B785-449A-ADF8-D0E2A04915A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DAAE63B2-B785-449A-ADF8-D0E2A04915A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DAAE63B2-B785-449A-ADF8-D0E2A04915A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DAAE63B2-B785-449A-ADF8-D0E2A04915A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{265380D8-F9FA-4E71-91CD-A2862727CE1A} = {302141CD-A246-40A8-877F-3D507212AFAC}
@@ -113,6 +107,5 @@ Global
 		{187C1912-3B0C-451B-9CD3-54A38C141C48} = {5E603124-F270-4959-8DCC-9482A2A38FB5}
 		{0A24BB1C-F5B3-4E6E-8DF7-6A98A262B2B9} = {5E603124-F270-4959-8DCC-9482A2A38FB5}
 		{DBD22237-A4E5-4673-A220-EAC6E1FC8405} = {C5E2FB20-2519-41B1-9C87-A8A97433A520}
-		{DAAE63B2-B785-449A-ADF8-D0E2A04915A0} = {C5E2FB20-2519-41B1-9C87-A8A97433A520}
 	EndGlobalSection
 EndGlobal

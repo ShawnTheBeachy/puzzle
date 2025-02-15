@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Puzzle.Abstractions;
 using Puzzle.Tests.Unit.TestPlugin.Abstractions;
 
-namespace Puzzle.Tests.Unit.TestPluginA;
+namespace Puzzle.Tests.Unit.TestPlugin;
 
 [Service<IDependentService>(ServiceLifetime.Transient)]
 public sealed class ExportedDependentService : IDependentService

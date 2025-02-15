@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Puzzle.Options;
-using Puzzle.Tests.Unit.TestPluginA;
+using Puzzle.Tests.Unit.TestPlugin;
 
 namespace Puzzle.Tests.Unit;
 

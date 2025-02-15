@@ -24,7 +24,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Puzzle\Puzzle.csproj"/>
-        <ProjectReference Include="..\Puzzle.Tests.Unit.TestPluginA\Puzzle.Tests.Unit.TestPluginA.csproj" />
+        <ProjectReference Include="..\Puzzle.Tests.Unit.TestPlugin\Puzzle.Tests.Unit.TestPlugin.csproj" />
     </ItemGroup>
     
     <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">

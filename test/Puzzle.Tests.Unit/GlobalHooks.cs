@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using Puzzle.Abstractions;
-using Puzzle.Tests.Unit.TestPluginA;
+using Puzzle.Tests.Unit.TestPlugin;
 
 namespace Puzzle.Tests.Unit;
 
