@@ -1,3 +1,3 @@
 ﻿namespace Puzzle.Tests.Unit.TestPlugin.Abstractions;
 
-public interface IExportedService;
+public interface IService;

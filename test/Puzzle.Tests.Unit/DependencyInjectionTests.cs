@@ -48,6 +48,43 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
+    public async Task ExclusiveService_ShouldBeReplaced_WhenItIsExportedFromPlugin()
+    {
+        // Arrange.
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    {
+                        $"{PuzzleOptions.SectionName}:{nameof(PuzzleOptions.Locations)}:0",
+                        GlobalHooks.PluginsPath
+                    },
+                }
+            )
+            .Build();
+        var services = new ServiceCollection().AddSingleton(Substitute.For<IExclusiveService>());
+
+        // Act.
+        var provider = services.AddPlugins(configuration).BuildServiceProvider();
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert
+            .That(services.Where(x => x.ServiceType == typeof(IExclusiveService)))
+            .HasCount()
+            .EqualToOne();
+        await Assert
+            .That(services)
+            .Contains(x =>
+                x.Lifetime == ExportedExclusiveService.Lifetime
+                && x.ImplementationFactory is not null
+            );
+        await Assert
+            .That(provider.GetService<IExclusiveService>()?.GetType().FullName)
+            .IsEqualTo(typeof(ExportedExclusiveService).FullName);
+    }
+
+    [Test]
     public async Task HostedService_ShouldBeRegisteredAsSingleton_WhenServiceAttributeSpecifiesDifferentLifetime()
     {
         // Arrange.
@@ -241,11 +278,11 @@ public sealed class DependencyInjectionTests
         await Assert
             .That(services)
             .Contains(x =>
-                x.ServiceType == typeof(IExportedService) && x.Lifetime == ExportedService.Lifetime
+                x.ServiceType == typeof(IService) && x.Lifetime == ExportedService.Lifetime
             );
         var provider = services.BuildServiceProvider();
         await Assert
-            .That(provider.GetService<IExportedService>()?.GetType().FullName)
+            .That(provider.GetService<IService>()?.GetType().FullName)
             .IsEqualTo(typeof(ExportedService).FullName);
     }
 
@@ -303,9 +340,9 @@ public sealed class DependencyInjectionTests
         using var asserts = Assert.Multiple();
         await Assert
             .That(services)
-            .DoesNotContain(x => x.ServiceType == typeof(IExportedServiceWithoutAttribute));
+            .DoesNotContain(x => x.ServiceType == typeof(IServiceWithoutAttribute));
         var provider = services.BuildServiceProvider();
-        await Assert.That(provider.GetService<IExportedServiceWithoutAttribute>()).IsNull();
+        await Assert.That(provider.GetService<IServiceWithoutAttribute>()).IsNull();
     }
 
     [Test]
@@ -331,9 +368,9 @@ public sealed class DependencyInjectionTests
 
         // Assert.
         using var asserts = Assert.Multiple();
-        await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(IExportedService));
+        await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(IService));
         var provider = services.BuildServiceProvider();
-        await Assert.That(provider.GetService<IExportedService>()).IsNull();
+        await Assert.That(provider.GetService<IService>()).IsNull();
     }
 
     [Test]

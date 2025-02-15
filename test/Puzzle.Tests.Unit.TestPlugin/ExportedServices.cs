@@ -4,8 +4,14 @@ using Puzzle.Tests.Unit.TestPlugin.Abstractions;
 
 namespace Puzzle.Tests.Unit.TestPlugin;
 
-[Service<IExportedService>(Lifetime)]
-public sealed class ExportedService : IExportedService
+[Service<IExclusiveService>(Lifetime)]
+public sealed class ExportedExclusiveService : IExclusiveService
+{
+    public const ServiceLifetime Lifetime = ServiceLifetime.Singleton;
+}
+
+[Service<IService>(Lifetime)]
+public sealed class ExportedService : IService
 {
     public const ServiceLifetime Lifetime = ServiceLifetime.Transient;
 }
@@ -19,4 +25,4 @@ public sealed class ExportedDependentService : IDependentService
     }
 }
 
-public sealed class ExportedServiceWithoutAttribute : IExportedServiceWithoutAttribute;
+public sealed class ExportedServiceWithoutAttribute : IServiceWithoutAttribute;

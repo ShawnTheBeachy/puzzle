@@ -1,6 +1,8 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Puzzle.Abstractions;
 using Puzzle.Bootstrap;
 using Puzzle.Options;
 
@@ -38,6 +40,7 @@ internal static class ServiceDependencyInjection
     {
         var isolate = options?.IsolatePlugins ?? new PuzzleOptions().IsolatePlugins;
         var isHostedService = implementationType.IsAssignableTo(typeof(IHostedService));
+        var isExclusive = !isHostedService && IsExclusive(serviceType);
 
         if (isHostedService)
         {
@@ -48,6 +51,16 @@ internal static class ServiceDependencyInjection
         var serviceDescriptor = isolate
             ? GetIsolatedService(serviceType, implementationType, lifetime, plugin)
             : new ServiceDescriptor(serviceType, implementationType, lifetime);
-        serviceCollection.Add(serviceDescriptor);
+
+        if (isExclusive)
+            serviceCollection.Replace(serviceDescriptor);
+        else
+            serviceCollection.Add(serviceDescriptor);
+    }
+
+    private static bool IsExclusive(Type serviceType)
+    {
+        var exclusiveAttribute = serviceType.GetCustomAttribute<ExclusiveAttribute>();
+        return exclusiveAttribute is not null;
     }
 }
