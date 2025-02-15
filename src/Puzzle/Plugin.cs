@@ -21,7 +21,7 @@ public sealed class Plugin
         Assembly assembly,
         Type? bootstrapperType,
         IPluginMetadata metadata,
-        bool isDisabled = false
+        bool isDisabled
     )
     {
         AllTypes = allTypes;

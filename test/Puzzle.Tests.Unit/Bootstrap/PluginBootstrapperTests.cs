@@ -19,7 +19,8 @@ public sealed class PluginBootstrapperTests
             Substitute.For<ITypeProvider>(),
             typeof(PluginBootstrapperTests).Assembly,
             null,
-            Substitute.For<IPluginMetadata>()
+            Substitute.For<IPluginMetadata>(),
+            false
         );
         var sut = new PluginBootstrapper(plugin);
 
@@ -41,7 +42,8 @@ public sealed class PluginBootstrapperTests
             Substitute.For<ITypeProvider>(),
             typeof(PluginBootstrapperTests).Assembly,
             typeof(TestBootstrapper),
-            Substitute.For<IPluginMetadata>()
+            Substitute.For<IPluginMetadata>(),
+            false
         );
         var sut = new PluginBootstrapper(plugin);
 
@@ -70,7 +72,8 @@ public sealed class PluginBootstrapperTests
             Substitute.For<ITypeProvider>(),
             typeof(PluginBootstrapperTests).Assembly,
             typeof(TestBootstrapper),
-            Substitute.For<IPluginMetadata>()
+            Substitute.For<IPluginMetadata>(),
+            false
         );
         var sut = new PluginBootstrapper(plugin);
 

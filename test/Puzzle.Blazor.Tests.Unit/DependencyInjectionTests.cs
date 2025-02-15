@@ -39,7 +39,8 @@ public sealed class DependencyInjectionTests
             typeProviderA,
             typeof(DependencyInjectionTests).Assembly,
             null,
-            Substitute.For<IPluginMetadata>()
+            Substitute.For<IPluginMetadata>(),
+            false
         );
 
         var typeProviderB = Substitute.For<ITypeProvider>();
@@ -48,7 +49,8 @@ public sealed class DependencyInjectionTests
             typeProviderB,
             typeof(DependencyInjectionTests).Assembly,
             null,
-            Substitute.For<IPluginMetadata>()
+            Substitute.For<IPluginMetadata>(),
+            false
         );
 
         var services = new ServiceCollection();
