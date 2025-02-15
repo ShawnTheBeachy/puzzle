@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Puzzle.Abstractions;
 using Puzzle.Options;
 using Puzzle.Tests.Unit.TestPlugin;
+using Puzzle.Tests.Unit.TestPlugin.Abstractions;
 using TUnit.Assertions.AssertConditions.Throws;
 
 namespace Puzzle.Tests.Unit;
@@ -212,8 +212,8 @@ public sealed class DependencyInjectionTests
         using var asserts = Assert.Multiple();
         await Assert.That(resolved).IsNotNull();
         await Assert.That(resolved!.Value.Locations[0]).IsEqualTo(locationA);
-        await Assert.That(resolved!.Value.Locations[1]).IsEqualTo(locationB);
-        await Assert.That(resolved!.Value.StartupThreshold).IsEqualTo(threshold);
+        await Assert.That(resolved.Value.Locations[1]).IsEqualTo(locationB);
+        await Assert.That(resolved.Value.StartupThreshold).IsEqualTo(threshold);
     }
 
     [Test]
@@ -241,11 +241,11 @@ public sealed class DependencyInjectionTests
         await Assert
             .That(services)
             .Contains(x =>
-                x.ServiceType == typeof(ITuple) && x.Lifetime == ExportedService.Lifetime
+                x.ServiceType == typeof(IExportedService) && x.Lifetime == ExportedService.Lifetime
             );
         var provider = services.BuildServiceProvider();
         await Assert
-            .That(provider.GetService<ITuple>()?.GetType().FullName)
+            .That(provider.GetService<IExportedService>()?.GetType().FullName)
             .IsEqualTo(typeof(ExportedService).FullName);
     }
 
@@ -270,12 +270,12 @@ public sealed class DependencyInjectionTests
         var provider = services.AddPlugins(configuration).BuildServiceProvider();
 
         // Assert.
-        var resolve = () => provider.GetRequiredService<ICloneable>();
+        var resolve = () => provider.GetRequiredService<IDependentService>();
         await Assert
             .That(resolve)
             .ThrowsExactly<InvalidOperationException>()
             .WithMessage(
-                $"Unable to resolve service for type '{typeof(IFormatProvider)}' while attempting to activate '{typeof(ExportedDependentService)}'."
+                $"Unable to resolve service for type '{typeof(IDependentService.IDependency)}' while attempting to activate '{typeof(ExportedDependentService)}'."
             );
     }
 
@@ -301,9 +301,11 @@ public sealed class DependencyInjectionTests
 
         // Assert.
         using var asserts = Assert.Multiple();
-        await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(IFormatProvider));
+        await Assert
+            .That(services)
+            .DoesNotContain(x => x.ServiceType == typeof(IExportedServiceWithoutAttribute));
         var provider = services.BuildServiceProvider();
-        await Assert.That(provider.GetService<IFormatProvider>()).IsNull();
+        await Assert.That(provider.GetService<IExportedServiceWithoutAttribute>()).IsNull();
     }
 
     [Test]
@@ -329,9 +331,9 @@ public sealed class DependencyInjectionTests
 
         // Assert.
         using var asserts = Assert.Multiple();
-        await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(ITuple));
+        await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(IExportedService));
         var provider = services.BuildServiceProvider();
-        await Assert.That(provider.GetService<ITuple>()).IsNull();
+        await Assert.That(provider.GetService<IExportedService>()).IsNull();
     }
 
     [Test]
@@ -354,15 +356,17 @@ public sealed class DependencyInjectionTests
 
         // Act.
         var provider = services
-            .AddSingleton(Substitute.For<IFormatProvider>())
+            .AddSingleton(Substitute.For<IDependentService.IDependency>())
             .AddPlugins(configuration)
             .BuildServiceProvider();
 
         // Assert.
         using var asserts = Assert.Multiple();
-        var service = services.First(x => x.ServiceType == typeof(ICloneable));
+        var service = services.First(x => x.ServiceType == typeof(IDependentService));
         await Assert.That(service.ImplementationType).IsEqualTo(typeof(ExportedDependentService));
-        await Assert.That(provider.GetService<ICloneable>()).IsTypeOf<ExportedDependentService>();
+        await Assert
+            .That(provider.GetService<IDependentService>())
+            .IsTypeOf<ExportedDependentService>();
     }
 
     [Test]

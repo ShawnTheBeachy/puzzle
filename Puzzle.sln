@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileParser.Plugins.Csv", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileParser.BlazorApp", "samples\FileParser\FileParser.BlazorApp\FileParser.BlazorApp.csproj", "{0A24BB1C-F5B3-4E6E-8DF7-6A98A262B2B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle.Tests.Unit.TestPlugin.Abstractions", "test\Puzzle.Tests.Unit.TestPlugin.Abstractions\Puzzle.Tests.Unit.TestPlugin.Abstractions.csproj", "{DBD22237-A4E5-4673-A220-EAC6E1FC8405}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,10 @@ Global
 		{0A24BB1C-F5B3-4E6E-8DF7-6A98A262B2B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A24BB1C-F5B3-4E6E-8DF7-6A98A262B2B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A24BB1C-F5B3-4E6E-8DF7-6A98A262B2B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBD22237-A4E5-4673-A220-EAC6E1FC8405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD22237-A4E5-4673-A220-EAC6E1FC8405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD22237-A4E5-4673-A220-EAC6E1FC8405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD22237-A4E5-4673-A220-EAC6E1FC8405}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{265380D8-F9FA-4E71-91CD-A2862727CE1A} = {302141CD-A246-40A8-877F-3D507212AFAC}
@@ -100,5 +106,6 @@ Global
 		{1070A81E-B505-40C7-9A99-54AD3E05B018} = {5E603124-F270-4959-8DCC-9482A2A38FB5}
 		{187C1912-3B0C-451B-9CD3-54A38C141C48} = {5E603124-F270-4959-8DCC-9482A2A38FB5}
 		{0A24BB1C-F5B3-4E6E-8DF7-6A98A262B2B9} = {5E603124-F270-4959-8DCC-9482A2A38FB5}
+		{DBD22237-A4E5-4673-A220-EAC6E1FC8405} = {C5E2FB20-2519-41B1-9C87-A8A97433A520}
 	EndGlobalSection
 EndGlobal
