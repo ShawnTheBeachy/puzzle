@@ -2,7 +2,7 @@
 using Puzzle.Abstractions;
 using Puzzle.Tests.Unit.TestPlugin.Abstractions;
 
-namespace Puzzle.Tests.Unit.TestPlugin;
+namespace Puzzle.Tests.Unit.TestPluginA;
 
 [Service<IExclusiveService>(Lifetime)]
 public sealed class ExportedExclusiveService : IExclusiveService

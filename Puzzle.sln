@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle", "src\Puzzle\Puzzle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle.Tests.Unit", "test\Puzzle.Tests.Unit\Puzzle.Tests.Unit.csproj", "{4EAB23CB-F359-49E2-AFB6-863745198626}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle.Tests.Unit.TestPlugin", "test\Puzzle.Tests.Unit.TestPlugin\Puzzle.Tests.Unit.TestPlugin.csproj", "{33DB30AC-6AC2-4D33-9A1F-10F92C0EE2CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puzzle.Tests.Unit.TestPluginA", "test\Puzzle.Tests.Unit.TestPluginA\Puzzle.Tests.Unit.TestPluginA.csproj", "{33DB30AC-6AC2-4D33-9A1F-10F92C0EE2CF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{6E8BDAD0-36DC-485E-A8D8-764AF673D858}"
 EndProject

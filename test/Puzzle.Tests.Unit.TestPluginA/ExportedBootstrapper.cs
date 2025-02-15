@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Puzzle.Abstractions;
 
-namespace Puzzle.Tests.Unit.TestPlugin;
+namespace Puzzle.Tests.Unit.TestPluginA;
 
 public sealed class ExportedBootstrapper : IPluginBootstrapper
 {

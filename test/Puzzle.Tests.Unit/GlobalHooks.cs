@@ -1,4 +1,4 @@
-﻿using Puzzle.Tests.Unit.TestPlugin;
+﻿using Puzzle.Tests.Unit.TestPluginA;
 
 namespace Puzzle.Tests.Unit;
 
@@ -15,6 +15,10 @@ internal static class GlobalHooks
         var dllName = new FileInfo(assembly.Location).Name;
         var dll = Path.Combine(assemblyDir, dllName);
         var pluginDir = Path.Combine(pluginsDir, "tests");
+
+        if (Directory.Exists(pluginDir))
+            Directory.Delete(pluginDir, true);
+
         Directory.CreateDirectory(pluginDir);
         File.Copy(dll, Path.Combine(pluginDir, dllName), true);
         PluginsPath = pluginsDir;
