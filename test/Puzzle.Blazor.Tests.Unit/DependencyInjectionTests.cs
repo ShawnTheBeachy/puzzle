@@ -38,9 +38,7 @@ public sealed class DependencyInjectionTests
         var pluginA = new Plugin(
             typeProviderA,
             typeof(DependencyInjectionTests).Assembly,
-            null,
-            Substitute.For<IPluginMetadata>(),
-            false
+            Substitute.For<IPluginMetadata>()
         );
 
         var typeProviderB = Substitute.For<ITypeProvider>();
@@ -48,9 +46,7 @@ public sealed class DependencyInjectionTests
         var pluginB = new Plugin(
             typeProviderB,
             typeof(DependencyInjectionTests).Assembly,
-            null,
-            Substitute.For<IPluginMetadata>(),
-            false
+            Substitute.For<IPluginMetadata>()
         );
 
         var services = new ServiceCollection();

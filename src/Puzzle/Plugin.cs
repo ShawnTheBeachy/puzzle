@@ -20,10 +20,10 @@ public sealed class Plugin
     internal Plugin(
         ITypeProvider allTypes,
         Assembly assembly,
-        Type? bootstrapperType,
         IPluginMetadata metadata,
-        bool isDisabled,
-        int? priority = null // TODO
+        Type? bootstrapperType = null,
+        bool isDisabled = false,
+        int? priority = null
     )
     {
         AllTypes = allTypes;
@@ -63,8 +63,8 @@ public sealed class Plugin
             plugin = new Plugin(
                 new TypeProvider(exportedTypes),
                 assembly,
-                exportedTypes.FirstOrDefault(typeof(IPluginBootstrapper).IsAssignableFrom),
                 metadata,
+                exportedTypes.FirstOrDefault(typeof(IPluginBootstrapper).IsAssignableFrom),
                 options.Disabled,
                 options.Priority
             );
