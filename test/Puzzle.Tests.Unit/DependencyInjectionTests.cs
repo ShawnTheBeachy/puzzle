@@ -407,6 +407,73 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
+    public async Task PluginService_ShouldReplaceOtherPluginService_WhenItsPriorityIsHigher()
+    {
+        // Arrange.
+        var typesA = Substitute.For<ITypeProvider>();
+        typesA.GetTypes().Returns([typeof(ServiceA)]);
+
+        var typesB = Substitute.For<ITypeProvider>();
+        typesB.GetTypes().Returns([typeof(ServiceB)]);
+
+        var metadata = Substitute.For<IPluginMetadata>();
+
+        var pluginA = new Plugin(
+            typesA,
+            typeof(DependencyInjectionTests).Assembly,
+            metadata,
+            priority: 1
+        );
+        var pluginB = new Plugin(
+            typesB,
+            typeof(DependencyInjectionTests).Assembly,
+            metadata,
+            priority: 2
+        );
+
+        var services = new ServiceCollection();
+
+        // Act.
+        var provider = services
+            .AddPlugins([pluginA, pluginB], Substitute.For<IConfiguration>())
+            .BuildServiceProvider();
+
+        // Assert.
+        await Assert.That(provider.GetService<IExclusiveService>()).IsTypeOf<ServiceA>();
+    }
+
+    [Test]
+    public async Task PluginService_ShouldReplaceOtherPluginService_WhenOtherPriorityIsNull()
+    {
+        // Arrange.
+        var typesA = Substitute.For<ITypeProvider>();
+        typesA.GetTypes().Returns([typeof(ServiceA)]);
+
+        var typesB = Substitute.For<ITypeProvider>();
+        typesB.GetTypes().Returns([typeof(ServiceB)]);
+
+        var metadata = Substitute.For<IPluginMetadata>();
+
+        var pluginA = new Plugin(
+            typesA,
+            typeof(DependencyInjectionTests).Assembly,
+            metadata,
+            priority: 1
+        );
+        var pluginB = new Plugin(typesB, typeof(DependencyInjectionTests).Assembly, metadata);
+
+        var services = new ServiceCollection();
+
+        // Act.
+        var provider = services
+            .AddPlugins([pluginA, pluginB], Substitute.For<IConfiguration>())
+            .BuildServiceProvider();
+
+        // Assert.
+        await Assert.That(provider.GetService<IExclusiveService>()).IsTypeOf<ServiceA>();
+    }
+
+    [Test]
     public async Task PuzzleConfigurationSection_ShouldBePassedToConfigAction()
     {
         // Arrange.
@@ -454,3 +521,9 @@ public sealed class DependencyInjectionTests
             .Matches(Logging.Messages.StartupThresholdWarning.Replace("{Elapsed}", "*"));
     }
 }
+
+[Service<IExclusiveService>(ServiceLifetime.Scoped)]
+file sealed class ServiceA : IExclusiveService;
+
+[Service<IExclusiveService>(ServiceLifetime.Scoped)]
+file sealed class ServiceB : IExclusiveService;

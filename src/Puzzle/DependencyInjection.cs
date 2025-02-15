@@ -34,8 +34,7 @@ public static class DependencyInjection
         var loader = new PluginLoader(configuration, logger);
         serviceCollection.AddSingleton<IPluginLoader>(loader);
 
-        foreach (var plugin in loader.Plugins())
-            HandlePlugin(plugin, serviceCollection, configuration);
+        serviceCollection.AddPlugins(loader.Plugins(), configuration);
 
         configure?.Invoke(
             new PuzzleConfiguration(loader.Plugins(), configuration, serviceCollection)
@@ -43,6 +42,22 @@ public static class DependencyInjection
 
         startupTimer.Stop();
         CheckStartupThreshold(startupTimer.Elapsed, loader.StartupThreshold, logger);
+        return serviceCollection;
+    }
+
+    internal static IServiceCollection AddPlugins(
+        this IServiceCollection serviceCollection,
+        IReadOnlyList<Plugin> plugins,
+        IConfiguration configuration
+    )
+    {
+        foreach (
+            var plugin in plugins
+                .OrderBy(x => x.Priority is not null)
+                .ThenByDescending(x => x.Priority)
+        )
+            HandlePlugin(plugin, serviceCollection, configuration);
+
         return serviceCollection;
     }
 
@@ -74,7 +89,7 @@ public static class DependencyInjection
         if (!(options?.IsolatePlugins ?? true))
             serviceCollection = plugin.Bootstrap(
                 serviceCollection,
-                (IConfiguration?)configuration.GetSection(plugin.Id)?.GetSection("Options")
+                (IConfiguration?)configuration.GetSection(plugin.Id).GetSection("Options")
                     ?? new ConfigurationBuilder().Build()
             );
 

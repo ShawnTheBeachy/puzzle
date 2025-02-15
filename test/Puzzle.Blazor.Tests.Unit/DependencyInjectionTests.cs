@@ -38,7 +38,6 @@ public sealed class DependencyInjectionTests
         var pluginA = new Plugin(
             typeProviderA,
             typeof(DependencyInjectionTests).Assembly,
-            null,
             Substitute.For<IPluginMetadata>()
         );
 
@@ -47,7 +46,6 @@ public sealed class DependencyInjectionTests
         var pluginB = new Plugin(
             typeProviderB,
             typeof(DependencyInjectionTests).Assembly,
-            null,
             Substitute.For<IPluginMetadata>()
         );
 

@@ -16,7 +16,6 @@ public sealed class PluginExtensionsTests
         var plugin = new Plugin(
             Substitute.For<ITypeProvider>(),
             typeof(PluginExtensionsTests).Assembly,
-            null,
             Substitute.For<IPluginMetadata>()
         );
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
@@ -39,7 +38,6 @@ public sealed class PluginExtensionsTests
         var plugin = new Plugin(
             Substitute.For<ITypeProvider>(),
             typeof(PluginExtensionsTests).Assembly,
-            null,
             Substitute.For<IPluginMetadata>()
         );
         var loggerFactory = Substitute.For<ILoggerFactory>();
@@ -65,8 +63,8 @@ public sealed class PluginExtensionsTests
         var plugin = new Plugin(
             Substitute.For<ITypeProvider>(),
             typeof(PluginExtensionsTests).Assembly,
-            typeof(TestBootstrapper),
-            Substitute.For<IPluginMetadata>()
+            Substitute.For<IPluginMetadata>(),
+            typeof(TestBootstrapper)
         );
         var baseServices = Substitute.For<IServiceProvider>();
         var services = new ServiceCollection();
