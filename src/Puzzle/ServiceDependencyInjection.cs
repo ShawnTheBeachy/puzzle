@@ -14,18 +14,21 @@ internal static class ServiceDependencyInjection
         Type serviceType,
         Type implementationType,
         ServiceLifetime lifetime,
+        object? key,
         Plugin plugin
     )
     {
-        return new ServiceDescriptor(serviceType, ImplementationFactory, lifetime);
+        return new ServiceDescriptor(serviceType, key, ImplementationFactory, lifetime);
 
-        object ImplementationFactory(IServiceProvider sp)
+        object ImplementationFactory(IServiceProvider sp, object? keyUsed)
         {
             var services = new ServiceCollection().Add(
-                new ServiceDescriptor(implementationType, implementationType, lifetime)
+                new ServiceDescriptor(implementationType, key, implementationType, lifetime)
             );
             var provider = plugin.Bootstrap(services, sp);
-            return provider.GetRequiredService(implementationType);
+            return key is null
+                ? provider.GetRequiredService(implementationType)
+                : provider.GetRequiredKeyedService(implementationType, key);
         }
     }
 
@@ -34,6 +37,7 @@ internal static class ServiceDependencyInjection
         Type serviceType,
         Type implementationType,
         ServiceLifetime lifetime,
+        object? key,
         Plugin plugin,
         PuzzleOptions? options
     )
@@ -49,8 +53,8 @@ internal static class ServiceDependencyInjection
         }
 
         var serviceDescriptor = isolate
-            ? GetIsolatedService(serviceType, implementationType, lifetime, plugin)
-            : new ServiceDescriptor(serviceType, implementationType, lifetime);
+            ? GetIsolatedService(serviceType, implementationType, lifetime, key, plugin)
+            : new ServiceDescriptor(serviceType, key, implementationType, lifetime);
 
         if (isExclusive)
             serviceCollection.Replace(serviceDescriptor);

@@ -576,6 +576,49 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
+    public async Task Service_ShouldBeRegisteredKeyed_WhenServiceKeyAttributeIsPresent()
+    {
+        // Arrange.
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(KeyedServiceA), typeof(KeyedServiceB)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(DependencyInjectionTests).Assembly,
+            new ExportedMetadata()
+        );
+
+        var services = new ServiceCollection().AddPlugins(
+            [plugin],
+            Substitute.For<IConfiguration>()
+        );
+
+        // Act.
+        var provider = services.BuildServiceProvider();
+        var serviceA = provider.GetKeyedService<IExclusiveService>(KeyedServiceA.Key);
+        var serviceB = provider.GetKeyedService<IExclusiveService>(KeyedServiceB.Key);
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert
+            .That(services)
+            .Contains(sd =>
+                sd.Lifetime == KeyedServiceA.Lifetime
+                && sd.ServiceType == typeof(IExclusiveService)
+                && sd.IsKeyedService
+            );
+        await Assert
+            .That(services)
+            .Contains(sd =>
+                sd.Lifetime == KeyedServiceB.Lifetime
+                && sd.ServiceType == typeof(IExclusiveService)
+                && sd.IsKeyedService
+            );
+        await Assert.That(serviceA).IsTypeOf<KeyedServiceA>();
+        await Assert.That(serviceB).IsTypeOf<KeyedServiceB>();
+    }
+
+    [Test]
     public async Task Warning_ShouldBeLogged_WhenStartupTakesLongerThanSpecifiedThreshold()
     {
         // Arrange.
@@ -601,8 +644,30 @@ public sealed class DependencyInjectionTests
     }
 }
 
-[Service<IExclusiveService>(ServiceLifetime.Scoped)]
-file sealed class ServiceA : IExclusiveService;
+[Service<IExclusiveService>(Lifetime)]
+[ServiceKey<string>(Key)]
+file sealed class KeyedServiceA : IExclusiveService
+{
+    public const string Key = nameof(KeyedServiceA);
+    public const ServiceLifetime Lifetime = ServiceLifetime.Scoped;
+}
 
-[Service<IExclusiveService>(ServiceLifetime.Scoped)]
-file sealed class ServiceB : IExclusiveService;
+[Service<IExclusiveService>(Lifetime)]
+[ServiceKey<string>(Key)]
+file sealed class KeyedServiceB : IExclusiveService
+{
+    public const string Key = nameof(KeyedServiceB);
+    public const ServiceLifetime Lifetime = ServiceLifetime.Transient;
+}
+
+[Service<IExclusiveService>(Lifetime)]
+file sealed class ServiceA : IExclusiveService
+{
+    public const ServiceLifetime Lifetime = ServiceLifetime.Scoped;
+}
+
+[Service<IExclusiveService>(Lifetime)]
+file sealed class ServiceB : IExclusiveService
+{
+    public const ServiceLifetime Lifetime = ServiceLifetime.Scoped;
+}

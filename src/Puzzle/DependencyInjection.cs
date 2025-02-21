@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Puzzle.Abstractions;
 using Puzzle.Bootstrap;
+using Puzzle.Extensions;
 using Puzzle.Options;
 
 namespace Puzzle;
@@ -96,24 +97,26 @@ public static class DependencyInjection
         foreach (var type in plugin.AllTypes.GetTypes())
         {
             if (
-                !type.TryFindService(out var serviceType, out var lifetime)
+                !type.TryFindService(out var serviceType, out var lifetime, out var key)
                 || serviceType is null
                 || lifetime is null
             )
                 continue;
 
-            serviceCollection.AddService(serviceType, type, lifetime.Value, plugin, options);
+            serviceCollection.AddService(serviceType, type, lifetime.Value, key, plugin, options);
         }
     }
 
     private static bool TryFindService(
         this Type type,
         out Type? serviceType,
-        out ServiceLifetime? lifetime
+        out ServiceLifetime? lifetime,
+        out object? key
     )
     {
         serviceType = null;
         lifetime = null;
+        key = null;
         var baseAttribute = type.GetCustomAttribute(typeof(ServiceAttribute<>), inherit: false);
 
         if (baseAttribute is null)
@@ -127,6 +130,7 @@ public static class DependencyInjection
             );
 
         lifetime = ((ServiceAttribute)baseAttribute).Lifetime;
+        key = type.GetServiceKey();
         return true;
     }
 }
