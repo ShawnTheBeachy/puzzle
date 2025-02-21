@@ -497,6 +497,85 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
+    public async Task ScopedService_ShouldUseDifferentInstance_WhenInDifferentParentScope()
+    {
+        // Arrange.
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(ServiceA)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(DependencyInjectionTests).Assembly,
+            new ExportedMetadata()
+        );
+
+        var services = new ServiceCollection().AddPlugins(
+            [plugin],
+            Substitute.For<IConfiguration>()
+        );
+        var provider = services.BuildServiceProvider();
+
+        // Act.
+        IExclusiveService serviceA,
+            serviceB;
+
+        await using (var scope = provider.CreateAsyncScope())
+        {
+            serviceA = scope.ServiceProvider.GetRequiredService<IExclusiveService>();
+        }
+
+        await using (var scope = provider.CreateAsyncScope())
+        {
+            serviceB = scope.ServiceProvider.GetRequiredService<IExclusiveService>();
+        }
+
+        // Assert.
+        await Assert.That(serviceA).IsNotSameReferenceAs(serviceB);
+    }
+
+    [Test]
+    public async Task ScopedService_ShouldUseSameInstance_WhenInSameParentScope()
+    {
+        // Arrange.
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(ServiceA)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(DependencyInjectionTests).Assembly,
+            new ExportedMetadata()
+        );
+
+        var services = new ServiceCollection().AddPlugins(
+            [plugin],
+            Substitute.For<IConfiguration>()
+        );
+        var provider = services.BuildServiceProvider();
+
+        // Act.
+        IExclusiveService serviceA,
+            serviceB,
+            serviceC;
+
+        await using (var scope = provider.CreateAsyncScope())
+        {
+            serviceA = scope.ServiceProvider.GetRequiredService<IExclusiveService>();
+            serviceB = scope.ServiceProvider.GetRequiredService<IExclusiveService>();
+        }
+
+        await using (var scope = provider.CreateAsyncScope())
+        {
+            serviceC = scope.ServiceProvider.GetRequiredService<IExclusiveService>();
+        }
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert.That(serviceA).IsSameReferenceAs(serviceB);
+        await Assert.That(serviceC).IsNotSameReferenceAs(serviceA);
+        await Assert.That(serviceC).IsNotSameReferenceAs(serviceB);
+    }
+
+    [Test]
     public async Task Warning_ShouldBeLogged_WhenStartupTakesLongerThanSpecifiedThreshold()
     {
         // Arrange.
