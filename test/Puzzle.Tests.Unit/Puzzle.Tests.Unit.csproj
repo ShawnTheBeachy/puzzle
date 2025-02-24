@@ -9,26 +9,25 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.4">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="NSubstitute" Version="5.3.0"/>
+        <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="17.14.1" />
+        <PackageReference Include="Microsoft.Testing.Extensions.CrashDump" Version="1.6.2" />
+        <PackageReference Include="Microsoft.Testing.Extensions.HangDump" Version="1.6.2" />
+        <PackageReference Include="NSubstitute" Version="5.3.0" />
         <PackageReference Include="TUnit" Version="0.12.23" />
     </ItemGroup>
 
     <ItemGroup>
-        <Using Include="NSubstitute"/>
-        <Using Include="TUnit"/>
+        <Using Include="NSubstitute" />
+        <Using Include="TUnit" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Puzzle\Puzzle.csproj"/>
+        <ProjectReference Include="..\..\src\Puzzle\Puzzle.csproj" />
         <ProjectReference Include="..\Puzzle.Tests.Unit.TestPlugin\Puzzle.Tests.Unit.TestPlugin.csproj" />
     </ItemGroup>
     
     <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">
-        <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High"/>
-        <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="..\.."/>
+        <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
+        <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="..\.." />
     </Target>
 </Project>

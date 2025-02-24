@@ -8,11 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="17.14.1" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CrashDump" Version="1.6.2" />
+    <PackageReference Include="Microsoft.Testing.Extensions.HangDump" Version="1.6.2" />
     <PackageReference Include="TUnit" Version="0.12.23" />
   </ItemGroup>
 
