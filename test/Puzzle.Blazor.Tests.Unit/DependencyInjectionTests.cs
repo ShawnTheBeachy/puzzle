@@ -1,7 +1,10 @@
+using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Puzzle.Abstractions;
+using Puzzle.Tests.Unit.TestPlugin;
 
 namespace Puzzle.Blazor.Tests.Unit;
 
@@ -74,6 +77,41 @@ public sealed class DependencyInjectionTests
         await Assert.That(services[1].Lifetime).IsEqualTo(ServiceLifetime.Transient);
         var resolvedB = services[0].ImplementationFactory!(Substitute.For<IServiceProvider>());
         await Assert.That(resolvedB).IsTypeOf<ComponentA>();
+    }
+
+    [Test]
+    public async Task AddBlazorComponents_ShouldAddComponentsFromPluginAssembly_WhenAssemblyHasComponents()
+    {
+        // Arrange.
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(ComponentA)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(DependencyInjectionTests).Assembly,
+            new ExportedMetadata()
+        );
+
+        var pluginLoader = Substitute.For<IPluginLoader>();
+        pluginLoader.Plugins().Returns([plugin]);
+
+        var appBuilder = WebApplication.CreateBuilder();
+        appBuilder.Services.AddRazorComponents();
+        appBuilder.Services.AddSingleton(pluginLoader);
+        var app = appBuilder.Build();
+
+        // Act.
+        var builder = app.MapRazorComponents<string>();
+        builder.AddPluginComponents(app);
+
+        // Assert.
+        var componentAppBuilder = typeof(RazorComponentsEndpointConventionBuilder)
+            .GetProperty("ApplicationBuilder", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .GetValue(builder)!;
+        var hasAssembly = componentAppBuilder.GetType().GetMethod("HasAssembly")!;
+        var hasThisAssembly = (bool)
+            hasAssembly.Invoke(componentAppBuilder, [typeof(ComponentA).Assembly.FullName])!;
+        await Assert.That(hasThisAssembly).IsTrue();
     }
 }
 
