@@ -52,3 +52,4 @@ jobs:
           retention-days: 1
     env:
       DescribeTests: false
+      TESTINGPLATFORM_TELEMETRY_OPTOUT: 1
