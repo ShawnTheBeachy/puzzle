@@ -33,8 +33,22 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build --configuration Debug --no-restore
+        run: dotnet build --configuration Release --no-restore
       - name: Test
-        run: dotnet test --no-restore --no-build --verbosity normal
+        run: |
+          dotnet exec test/Puzzle.Abstractions.Tests.Unit/Release/net9.0/Puzzle.Abstractions.Tests.Unit.dll --coverage --crashdump --hangdump
+          dotnet exec test/Puzzle.Blazor.Tests.Unit/Release/net9.0/Puzzle.Blazor.Tests.Unit.dll --coverage --crashdump --hangdump
+          dotnet exec test/Puzzle.Tests.Unit/Release/net9.0/Puzzle.Tests.Unit.dll --coverage --crashdump --hangdump
+      - name: Generate code coverage report
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:"test/**/TestResults/**/coverage.cobertura.xml" -targetdir:"test/coverage-report" -filefilters:"-*.g.cs" -assemblyfilters:"-Puzzle*.Tests.*"
+      - name: Upload code coverage report
+        uses: actions/upload-artifact@v4
+        if: '!cancelled()'
+        with:
+          name: coverage-report
+          path: test/coverage-report/
+          retention-days: 1
     env:
       DescribeTests: false
