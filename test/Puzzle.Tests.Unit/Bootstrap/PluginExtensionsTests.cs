@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Puzzle.Abstractions;
 using Puzzle.Bootstrap;
+using Puzzle.Tests.Unit.TestPlugin;
 
 namespace Puzzle.Tests.Unit.Bootstrap;
 
@@ -74,6 +75,24 @@ public sealed class PluginExtensionsTests
 
         // Assert.
         await Assert.That(bootstrapped.GetService<string>()).IsEqualTo(TestBootstrapper.Foo);
+    }
+
+    [Test]
+    public async Task Bootstrap_ShouldNotThrow_WhenPluginBootstrapperTypeIsNull()
+    {
+        // Arrange.
+        var plugin = new Plugin(
+            Substitute.For<ITypeProvider>(),
+            typeof(PluginExtensionsTests).Assembly,
+            new ExportedMetadata()
+        );
+        var services = new ServiceCollection();
+
+        // Act.
+        var bootstrapped = plugin.Bootstrap(services, Substitute.For<IConfiguration>());
+
+        // Assert.
+        await Assert.That(bootstrapped).IsSameReferenceAs(services);
     }
 }
 

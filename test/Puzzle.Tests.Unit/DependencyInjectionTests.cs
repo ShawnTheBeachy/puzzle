@@ -28,6 +28,36 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
+    public async Task AddPlugins_ShouldThrow_WhenPluginServiceIsRegisteredForAbstractionWhichItDoesNotImplement()
+    {
+        // Arrange.
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(InvalidService)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(DependencyInjectionTests).Assembly,
+            new ExportedMetadata()
+        );
+        var services = new ServiceCollection();
+
+        // Assert.
+        await Assert
+            .That(Act)
+            .ThrowsExactly<Exception>()
+            .WithMessage(
+                DependencyInjection.Messages.ServiceNotImplemented(
+                    typeof(InvalidService),
+                    typeof(IExclusiveService)
+                )
+            );
+        return;
+
+        // Act.
+        void Act() => services.AddPlugins([plugin], Substitute.For<IConfiguration>());
+    }
+
+    [Test]
     public async Task AddPluginsToHostBuild_ShouldPassHostServices()
     {
         // Arrange.
@@ -642,6 +672,12 @@ public sealed class DependencyInjectionTests
             .That(logger.LogMessages[0].Message)
             .Matches(Logging.Messages.StartupThresholdWarning.Replace("{Elapsed}", "*"));
     }
+}
+
+[Service<IExclusiveService>(Lifetime)]
+file sealed class InvalidService
+{
+    public const ServiceLifetime Lifetime = ServiceLifetime.Scoped;
 }
 
 [Service<IExclusiveService>(Lifetime)]

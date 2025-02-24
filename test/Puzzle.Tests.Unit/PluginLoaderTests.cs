@@ -8,6 +8,30 @@ namespace Puzzle.Tests.Unit;
 public sealed class PluginLoaderTests
 {
     [Test]
+    public async Task Assembly_ShouldBeSkipped_WhenItIsNotAPlugin()
+    {
+        // Arrange.
+        var assembly = typeof(PluginLoaderTests).Assembly;
+        var fileInfo = new FileInfo(assembly.Location);
+        var pluginsDir = fileInfo.Directory?.Parent;
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    { $"{nameof(PuzzleOptions.Locations)}:0", pluginsDir?.FullName },
+                }
+            )
+            .Build();
+
+        // Act.
+        var loader = new PluginLoader(configuration, Substitute.For<ILogger<PluginLoader>>());
+
+        // Assert.
+        await Assert.That(loader.Plugins).IsEmpty();
+    }
+
+    [Test]
     public async Task Information_ShouldBeLogged_WhenPluginIsDiscovered()
     {
         // Arrange.

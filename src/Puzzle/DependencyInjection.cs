@@ -125,12 +125,16 @@ public static class DependencyInjection
         serviceType = baseAttribute.GetType().GetGenericArguments()[0];
 
         if (!serviceType.IsAssignableFrom(type))
-            throw new Exception(
-                $"{type} is registered as a plugin for {serviceType} but {type} does not implement {serviceType}."
-            );
+            throw new Exception(Messages.ServiceNotImplemented(type, serviceType));
 
         lifetime = ((ServiceAttribute)baseAttribute).Lifetime;
         key = type.GetServiceKey();
         return true;
+    }
+
+    internal static class Messages
+    {
+        public static string ServiceNotImplemented(Type implementationType, Type serviceType) =>
+            $"{implementationType} is registered as a plugin for {serviceType} but {implementationType} does not implement {serviceType}.";
     }
 }
