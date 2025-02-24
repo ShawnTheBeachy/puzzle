@@ -36,9 +36,9 @@ jobs:
         run: dotnet build --configuration Debug --no-restore
       - name: Test
         run: |
-          dotnet exec test/Puzzle.Abstractions.Tests.Unit/Debug/net9.0/Puzzle.Abstractions.Tests.Unit.dll --coverage --crashdump --hangdump
-          dotnet exec test/Puzzle.Blazor.Tests.Unit/Debug/net9.0/Puzzle.Blazor.Tests.Unit.dll --coverage --crashdump --hangdump
-          dotnet exec test/Puzzle.Tests.Unit/Debug/net9.0/Puzzle.Tests.Unit.dll --coverage --crashdump --hangdump
+          dotnet exec ./test/Puzzle.Abstractions.Tests.Unit/Debug/net9.0/Puzzle.Abstractions.Tests.Unit.dll --coverage --crashdump --hangdump
+          dotnet exec ./test/Puzzle.Blazor.Tests.Unit/Debug/net9.0/Puzzle.Blazor.Tests.Unit.dll --coverage --crashdump --hangdump
+          dotnet exec ./test/Puzzle.Tests.Unit/Debug/net9.0/Puzzle.Tests.Unit.dll --coverage --crashdump --hangdump
       - name: Generate code coverage report
         run: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
