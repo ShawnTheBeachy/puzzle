@@ -39,23 +39,17 @@ internal sealed class PluginLoader : IPluginLoader
         }
     }
 
+    private IEnumerable<Plugin> EligiblePlugins(string? pluginId) =>
+        pluginId is null ? _plugins : _plugins.Where(x => x.Id == pluginId);
+
     public TService? GetService<TService>(string? pluginId = null)
         where TService : class
     {
-        foreach (var plugin in _plugins)
+        foreach (var plugin in EligiblePlugins(pluginId).OrderBy(x => x.Priority))
         {
-            if (pluginId is not null && plugin.Id != pluginId)
-                continue;
-
             foreach (var type in plugin.AllTypes.GetTypes())
             {
-                if (!type.IsAssignableTo(typeof(TService)))
-                    continue;
-
-                if (!type.TryFindService(out var serviceType, out _, out _))
-                    continue;
-
-                if (serviceType != typeof(TService))
+                if (!IsService<TService>(type))
                     continue;
 
                 var services = new ServiceCollection().AddTransient(type, type);
@@ -66,6 +60,17 @@ internal sealed class PluginLoader : IPluginLoader
         }
 
         return null;
+    }
+
+    private static bool IsService<TService>(Type type)
+    {
+        if (!type.IsAssignableTo(typeof(TService)))
+            return false;
+
+        if (!type.TryFindService(out var serviceType, out _, out _))
+            return false;
+
+        return serviceType == typeof(TService);
     }
 
     public IReadOnlyList<Plugin> Plugins() => _plugins.ToArray();
