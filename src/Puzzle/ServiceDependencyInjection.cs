@@ -26,9 +26,10 @@ internal static class ServiceDependencyInjection
                 new ServiceDescriptor(implementationType, key, implementationType, lifetime)
             );
             var provider = plugin.Bootstrap(services, sp);
-            return key is null
+            var resolved = key is null
                 ? provider.GetRequiredService(implementationType)
                 : provider.GetRequiredKeyedService(implementationType, key);
+            return resolved;
         }
     }
 
