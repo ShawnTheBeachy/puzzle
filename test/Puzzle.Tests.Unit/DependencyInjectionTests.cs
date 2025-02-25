@@ -48,7 +48,7 @@ public sealed class DependencyInjectionTests
             .WithMessage(
                 DependencyInjection.Messages.ServiceNotImplemented(
                     typeof(InvalidService),
-                    typeof(IExclusiveService)
+                    typeof(IService)
                 )
             );
         return;
@@ -347,6 +347,49 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
+    public async Task PluginService_ShouldBeRegisteredKeyed_WhenServiceKeyAttributeIsPresent()
+    {
+        // Arrange.
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(KeyedServiceA), typeof(KeyedServiceB)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(DependencyInjectionTests).Assembly,
+            new ExportedMetadata()
+        );
+
+        var services = new ServiceCollection().AddPlugins(
+            [plugin],
+            Substitute.For<IConfiguration>()
+        );
+
+        // Act.
+        var provider = services.BuildServiceProvider();
+        var serviceA = provider.GetKeyedService<IExclusiveService>(KeyedServiceA.Key);
+        var serviceB = provider.GetKeyedService<IExclusiveService>(KeyedServiceB.Key);
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert
+            .That(services)
+            .Contains(sd =>
+                sd.Lifetime == KeyedServiceA.Lifetime
+                && sd.ServiceType == typeof(IExclusiveService)
+                && sd.IsKeyedService
+            );
+        await Assert
+            .That(services)
+            .Contains(sd =>
+                sd.Lifetime == KeyedServiceB.Lifetime
+                && sd.ServiceType == typeof(IExclusiveService)
+                && sd.IsKeyedService
+            );
+        await Assert.That(serviceA).IsTypeOf<KeyedServiceA>();
+        await Assert.That(serviceB).IsTypeOf<KeyedServiceB>();
+    }
+
+    [Test]
     public async Task PluginService_ShouldNotBeRegistered_WhenItIsExportedFromPluginInLocationSpecifiedInOptionsButDoesNotHaveServiceAttribute()
     {
         // Arrange.
@@ -373,6 +416,31 @@ public sealed class DependencyInjectionTests
             .DoesNotContain(x => x.ServiceType == typeof(IServiceWithoutAttribute));
         var provider = services.BuildServiceProvider();
         await Assert.That(provider.GetService<IServiceWithoutAttribute>()).IsNull();
+    }
+
+    [Test]
+    public async Task PluginService_ShouldNotBeRegistered_WhenItDoesNotHaveALifetimeSpecified()
+    {
+        // Arrange.
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(UnregisteredService)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(DependencyInjectionTests).Assembly,
+            new ExportedMetadata()
+        );
+
+        var services = new ServiceCollection();
+
+        // Act.
+        services.AddPlugins([plugin], Substitute.For<IConfiguration>());
+
+        // Assert.
+        using var asserts = Assert.Multiple();
+        await Assert.That(services).DoesNotContain(x => x.ServiceType == typeof(IService));
+        var provider = services.BuildServiceProvider();
+        await Assert.That(provider.GetService<IService>()).IsNull();
     }
 
     [Test]
@@ -527,7 +595,7 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
-    public async Task ScopedService_ShouldUseDifferentInstance_WhenInDifferentParentScope()
+    public async Task ScopedPluginService_ShouldUseDifferentInstance_WhenInDifferentParentScope()
     {
         // Arrange.
         var typeProvider = Substitute.For<ITypeProvider>();
@@ -564,7 +632,7 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
-    public async Task ScopedService_ShouldUseSameInstance_WhenInSameParentScope()
+    public async Task ScopedPluginService_ShouldUseSameInstance_WhenInSameParentScope()
     {
         // Arrange.
         var typeProvider = Substitute.For<ITypeProvider>();
@@ -606,49 +674,6 @@ public sealed class DependencyInjectionTests
     }
 
     [Test]
-    public async Task Service_ShouldBeRegisteredKeyed_WhenServiceKeyAttributeIsPresent()
-    {
-        // Arrange.
-        var typeProvider = Substitute.For<ITypeProvider>();
-        typeProvider.GetTypes().Returns([typeof(KeyedServiceA), typeof(KeyedServiceB)]);
-
-        var plugin = new Plugin(
-            typeProvider,
-            typeof(DependencyInjectionTests).Assembly,
-            new ExportedMetadata()
-        );
-
-        var services = new ServiceCollection().AddPlugins(
-            [plugin],
-            Substitute.For<IConfiguration>()
-        );
-
-        // Act.
-        var provider = services.BuildServiceProvider();
-        var serviceA = provider.GetKeyedService<IExclusiveService>(KeyedServiceA.Key);
-        var serviceB = provider.GetKeyedService<IExclusiveService>(KeyedServiceB.Key);
-
-        // Assert.
-        using var asserts = Assert.Multiple();
-        await Assert
-            .That(services)
-            .Contains(sd =>
-                sd.Lifetime == KeyedServiceA.Lifetime
-                && sd.ServiceType == typeof(IExclusiveService)
-                && sd.IsKeyedService
-            );
-        await Assert
-            .That(services)
-            .Contains(sd =>
-                sd.Lifetime == KeyedServiceB.Lifetime
-                && sd.ServiceType == typeof(IExclusiveService)
-                && sd.IsKeyedService
-            );
-        await Assert.That(serviceA).IsTypeOf<KeyedServiceA>();
-        await Assert.That(serviceB).IsTypeOf<KeyedServiceB>();
-    }
-
-    [Test]
     public async Task Warning_ShouldBeLogged_WhenStartupTakesLongerThanSpecifiedThreshold()
     {
         // Arrange.
@@ -674,7 +699,7 @@ public sealed class DependencyInjectionTests
     }
 }
 
-[Service<IExclusiveService>(Lifetime)]
+[Service<IService>(Lifetime)]
 file sealed class InvalidService
 {
     public const ServiceLifetime Lifetime = ServiceLifetime.Scoped;
@@ -707,3 +732,6 @@ file sealed class ServiceB : IExclusiveService
 {
     public const ServiceLifetime Lifetime = ServiceLifetime.Scoped;
 }
+
+[Service<IService>]
+file sealed class UnregisteredService : IService;
