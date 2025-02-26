@@ -10,23 +10,33 @@ namespace Puzzle;
 
 internal sealed class PluginLoader : IPluginLoader
 {
-    private readonly List<Plugin> _plugins = [];
+    private readonly IReadOnlyList<Plugin> _plugins;
     private readonly IServiceProvider _serviceProvider;
     public TimeSpan? StartupThreshold { get; }
 
     public PluginLoader(
+        IReadOnlyList<Plugin> plugins,
+        TimeSpan? startupThreshold,
+        IServiceProvider serviceProvider
+    )
+    {
+        _plugins = plugins;
+        _serviceProvider = serviceProvider;
+        StartupThreshold = startupThreshold;
+    }
+
+    public static PluginLoader Create(
         IConfiguration configuration,
         ILogger<PluginLoader> logger,
         IServiceProvider serviceProvider
     )
     {
-        _serviceProvider = serviceProvider;
         var options = configuration.Get<PuzzleOptions>();
 
         if (options is null)
-            return;
+            return new PluginLoader([], null, serviceProvider);
 
-        StartupThreshold = options.StartupThreshold;
+        var plugins = new List<Plugin>();
         var pluginAssemblies = AssemblyScanning.ScanAssemblies(options, logger);
 
         foreach (var assembly in pluginAssemblies)
@@ -34,9 +44,11 @@ internal sealed class PluginLoader : IPluginLoader
             if (!Plugin.TryCreate(assembly, configuration, out var plugin) || plugin is null)
                 continue;
 
-            _plugins.Add(plugin);
+            plugins.Add(plugin);
             logger.DiscoveredPlugin(plugin.Name, plugin.Id);
         }
+
+        return new PluginLoader(plugins, options.StartupThreshold, serviceProvider);
     }
 
     private IEnumerable<Plugin> EligiblePlugins(string? pluginId) =>

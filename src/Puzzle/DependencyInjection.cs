@@ -31,11 +31,9 @@ public static class DependencyInjection
         var startupTimer = new Stopwatch();
         startupTimer.Start();
 
-        serviceCollection.AddSingleton<IPluginLoader, PluginLoader>(sp => new PluginLoader(
-            configuration,
-            sp.GetRequiredService<ILogger<PluginLoader>>(),
-            sp
-        ));
+        serviceCollection.AddSingleton<IPluginLoader, PluginLoader>(sp =>
+            PluginLoader.Create(configuration, sp.GetRequiredService<ILogger<PluginLoader>>(), sp)
+        );
 
         using var loaderProvider = serviceCollection.BuildServiceProvider();
         var loader = (PluginLoader)loaderProvider.GetRequiredService<IPluginLoader>();

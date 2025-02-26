@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Puzzle.Abstractions;
 using Puzzle.Options;
 using Puzzle.Tests.Unit.TestPlugin;
 using Puzzle.Tests.Unit.TestPlugin.Abstractions;
@@ -26,7 +27,7 @@ public sealed class PluginLoaderTests
             .Build();
 
         // Act.
-        var loader = new PluginLoader(
+        var loader = PluginLoader.Create(
             configuration,
             Substitute.For<ILogger<PluginLoader>>(),
             Substitute.For<IServiceProvider>()
@@ -37,28 +38,51 @@ public sealed class PluginLoaderTests
     }
 
     [Test]
-    public async Task GetService_ShouldRespectPluginPriority_WhenMultipleServicesAreFound() { }
+    public async Task GetService_ShouldRespectPluginPriority_WhenMultipleServicesAreFound()
+    {
+        // Arrange.
+        var typeProviderA = Substitute.For<ITypeProvider>();
+        typeProviderA.GetTypes().Returns([typeof(ServiceA)]);
+
+        var typeProviderB = Substitute.For<ITypeProvider>();
+        typeProviderB.GetTypes().Returns([typeof(ServiceB)]);
+
+        var pluginA = new Plugin(
+            typeProviderA,
+            typeof(PluginLoaderTests).Assembly,
+            new ExportedMetadata(),
+            priority: 2
+        );
+        var pluginB = new Plugin(
+            typeProviderB,
+            typeof(PluginLoaderTests).Assembly,
+            new ExportedMetadata(),
+            priority: 1
+        );
+
+        var loader = new PluginLoader([pluginA, pluginB], null, Substitute.For<IServiceProvider>());
+
+        // Act.
+        var resolved = loader.GetService<IService>();
+
+        // Assert.
+        await Assert.That(resolved).IsTypeOf<ServiceB>();
+    }
 
     [Test]
     public async Task GetService_ShouldReturnNull_WhenNoServicesAreFound()
     {
         // Arrange.
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    { $"{nameof(PuzzleOptions.Locations)}:0", GlobalHooks.PluginsPath },
-                }
-            )
-            .Build();
-        var loader = new PluginLoader(
-            configuration,
-            Substitute.For<ILogger<PluginLoader>>(),
-            Substitute.For<IServiceProvider>()
+        var plugin = new Plugin(
+            Substitute.For<ITypeProvider>(),
+            typeof(PluginLoaderTests).Assembly,
+            new ExportedMetadata()
         );
 
+        var loader = new PluginLoader([plugin], null, Substitute.For<IServiceProvider>());
+
         // Act.
-        var resolved = loader.GetService<string>();
+        var resolved = loader.GetService<IService>();
 
         // Assert.
         await Assert.That(resolved).IsNull();
@@ -68,19 +92,16 @@ public sealed class PluginLoaderTests
     public async Task GetService_ShouldReturnNull_WhenServiceIsFoundFromDifferentPluginThanSpecified()
     {
         // Arrange.
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    { $"{nameof(PuzzleOptions.Locations)}:0", GlobalHooks.PluginsPath },
-                }
-            )
-            .Build();
-        var loader = new PluginLoader(
-            configuration,
-            Substitute.For<ILogger<PluginLoader>>(),
-            Substitute.For<IServiceProvider>()
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(ExportedService)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(PluginLoaderTests).Assembly,
+            new ExportedMetadata()
         );
+
+        var loader = new PluginLoader([plugin], null, Substitute.For<IServiceProvider>());
 
         // Act.
         var resolved = loader.GetService<IService>("fake.plugin");
@@ -90,28 +111,47 @@ public sealed class PluginLoaderTests
     }
 
     [Test]
-    public async Task GetService_ShouldReturnService_WhenServiceIsFound()
+    public async Task GetService_ShouldReturnService_WhenPluginIdIsNotSpecifiedAndServiceIsFoundFromAnyPlugin()
     {
         // Arrange.
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    { $"{nameof(PuzzleOptions.Locations)}:0", GlobalHooks.PluginsPath },
-                }
-            )
-            .Build();
-        var loader = new PluginLoader(
-            configuration,
-            Substitute.For<ILogger<PluginLoader>>(),
-            Substitute.For<IServiceProvider>()
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(ExportedService)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(PluginLoaderTests).Assembly,
+            new ExportedMetadata()
         );
+
+        var loader = new PluginLoader([plugin], null, Substitute.For<IServiceProvider>());
 
         // Act.
         var resolved = loader.GetService<IService>();
 
         // Assert.
-        await Assert.That(resolved?.GetType().FullName).IsEqualTo(typeof(ExportedService).FullName);
+        await Assert.That(resolved).IsTypeOf<ExportedService>();
+    }
+
+    [Test]
+    public async Task GetService_ShouldReturnService_WhenPluginIdIsSpecifiedAndServiceIsFoundFromThatPlugin()
+    {
+        // Arrange.
+        var typeProvider = Substitute.For<ITypeProvider>();
+        typeProvider.GetTypes().Returns([typeof(ExportedService)]);
+
+        var plugin = new Plugin(
+            typeProvider,
+            typeof(PluginLoaderTests).Assembly,
+            new ExportedMetadata()
+        );
+
+        var loader = new PluginLoader([plugin], null, Substitute.For<IServiceProvider>());
+
+        // Act.
+        var resolved = loader.GetService<IService>(new ExportedMetadata().Id);
+
+        // Assert.
+        await Assert.That(resolved).IsTypeOf<ExportedService>();
     }
 
     [Test]
@@ -129,7 +169,7 @@ public sealed class PluginLoaderTests
         var logger = new TestableLogger<PluginLoader>();
 
         // Act.
-        var sut = new PluginLoader(configuration, logger, Substitute.For<IServiceProvider>());
+        var sut = PluginLoader.Create(configuration, logger, Substitute.For<IServiceProvider>());
 
         // Assert.
         using var asserts = Assert.Multiple();
@@ -158,7 +198,7 @@ public sealed class PluginLoaderTests
             .Build();
 
         // Act.
-        var sut = new PluginLoader(
+        var sut = PluginLoader.Create(
             configuration,
             Substitute.For<ILogger<PluginLoader>>(),
             Substitute.For<IServiceProvider>()
@@ -170,3 +210,9 @@ public sealed class PluginLoaderTests
         await Assert.That(sut.Plugins()[0].Id).IsEqualTo(new ExportedMetadata().Id);
     }
 }
+
+[Service<IService>]
+file sealed class ServiceA : IService;
+
+[Service<IService>]
+file sealed class ServiceB : IService;
