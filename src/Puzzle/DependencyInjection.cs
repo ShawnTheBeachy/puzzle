@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,8 +31,14 @@ public static class DependencyInjection
         var startupTimer = new Stopwatch();
         startupTimer.Start();
 
-        var loader = new PluginLoader(configuration, logger);
-        serviceCollection.AddSingleton<IPluginLoader>(loader);
+        serviceCollection.AddSingleton<IPluginLoader, PluginLoader>(sp => new PluginLoader(
+            configuration,
+            sp.GetRequiredService<ILogger<PluginLoader>>(),
+            sp
+        ));
+
+        using var loaderProvider = serviceCollection.BuildServiceProvider();
+        var loader = (PluginLoader)loaderProvider.GetRequiredService<IPluginLoader>();
 
         serviceCollection.AddPlugins(loader.Plugins(), configuration);
 
@@ -105,36 +110,5 @@ public static class DependencyInjection
 
             serviceCollection.AddService(serviceType, type, lifetime.Value, key, plugin, options);
         }
-    }
-
-    private static bool TryFindService(
-        this Type type,
-        out Type? serviceType,
-        out ServiceLifetime? lifetime,
-        out object? key
-    )
-    {
-        serviceType = null;
-        lifetime = null;
-        key = null;
-        var baseAttribute = type.GetCustomAttribute(typeof(ServiceAttribute<>), inherit: false);
-
-        if (baseAttribute is null)
-            return false;
-
-        serviceType = baseAttribute.GetType().GetGenericArguments()[0];
-
-        if (!serviceType.IsAssignableFrom(type))
-            throw new Exception(Messages.ServiceNotImplemented(type, serviceType));
-
-        lifetime = ((ServiceAttribute)baseAttribute).Lifetime;
-        key = type.GetServiceKey();
-        return true;
-    }
-
-    internal static class Messages
-    {
-        public static string ServiceNotImplemented(Type implementationType, Type serviceType) =>
-            $"{implementationType} is registered as a plugin for {serviceType} but {implementationType} does not implement {serviceType}.";
     }
 }

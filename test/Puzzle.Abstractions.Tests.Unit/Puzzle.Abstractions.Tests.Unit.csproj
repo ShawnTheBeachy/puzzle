@@ -12,7 +12,7 @@
     <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="17.14.1" />
     <PackageReference Include="Microsoft.Testing.Extensions.CrashDump" Version="1.6.2" />
     <PackageReference Include="Microsoft.Testing.Extensions.HangDump" Version="1.6.2" />
-    <PackageReference Include="TUnit" Version="0.12.23" />
+    <PackageReference Include="TUnit" Version="0.14.10" />
   </ItemGroup>
 
   <ItemGroup>
