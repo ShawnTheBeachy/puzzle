@@ -42,7 +42,7 @@ jobs:
       - name: Upload packages
         uses: actions/upload-artifact@v4
         with:
-          name: blazor
+          name: package
           if-no-files-found: error
           retention-days: 2
           path: ${{ env.NuGetDirectory }}/*.nupkg
